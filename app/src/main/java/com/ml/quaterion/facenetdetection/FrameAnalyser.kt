@@ -7,109 +7,118 @@ import android.os.Environment
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
-import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_NV21
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.collections.ArrayList
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 // Analyser class to process frames and produce detections.
-class FrameAnalyser( private var context: Context , private var boundingBoxOverlay: BoundingBoxOverlay ) : ImageAnalysis.Analyzer {
+class FrameAnalyser(
+    private var context: Context,
+    private var boundingBoxOverlay: BoundingBoxOverlay
+) : ImageAnalysis.Analyzer {
 
     // Configure the FirebaseVisionFaceDetector
-    private val realTimeOpts = FirebaseVisionFaceDetectorOptions.Builder()
-        .setPerformanceMode(FirebaseVisionFaceDetectorOptions.FAST)
+    private val realTimeOpts = FaceDetectorOptions.Builder()
+        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         .build()
-    private val detector = FirebaseVision.getInstance().getVisionFaceDetector(realTimeOpts)
+
+    val faceDetector = FaceDetection.getClient(realTimeOpts)
 
     // Used to determine whether the incoming frame should be dropped or processed.
     private var isProcessing = AtomicBoolean(false)
 
-    // FirebaseImageMeta for defining input image params.
-    private var metadata = FirebaseVisionImageMetadata.Builder()
-        .setWidth(640)
-        .setHeight(480)
-        .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21 )
-        .setRotation(degreesToFirebaseRotation(90))
-        .build()
+//    // FirebaseImageMeta for defining input image params.
+//    private var metadata = FirebaseVisionImageMetadata.Builder()
+//        .setWidth(640)
+//        .setHeight(480)
+// .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21 )
+//        .setRotation(degreesToFirebaseRotation(90))
+//        .build()
 
     // Store the face embeddings in a ( String , FloatArray ) ArrayList.
     // Where String -> name of the person abd FloatArray -> Embedding of the face.
-    var faceList = ArrayList<Pair<String,FloatArray>>()
+    var faceList = ArrayList<Pair<String, FloatArray>>()
 
     // FaceNet model utility class
-    private val model = FaceNetModel( context )
+    private val model = FaceNetModel(context)
 
     // Here's where we receive our frames.
     override fun analyze(image: ImageProxy?, rotationDegrees: Int) {
 
         // android.media.Image -> android.graphics.Bitmap
-        val bitmap = toBitmap( image?.image!! )
+        val bitmap = toBitmap(image?.image!!)
 
         // If the previous frame is still being processed, then skip this frame
         if (isProcessing.get()) {
             return
-        }
-        else {
+        } else {
             // Declare that the current frame is being processed.
             isProcessing.set(true)
 
             // Perform face detection
-            val inputImage = FirebaseVisionImage.fromByteArray( BitmaptoNv21( bitmap ) , metadata )
-            detector.detectInImage(inputImage)
-                .addOnSuccessListener { faces ->
-                    // Start a new thread to avoid frequent lags.
-                    Thread {
-                        val predictions = ArrayList<Prediction>()
-                        for (face in faces) {
-                            try {
-                                // Crop the frame using face.boundingBox.
-                                // Convert the cropped Bitmap to a ByteBuffer.
-                                // Finally, feed the ByteBuffer to the FaceNet model.
-                                val subject = model.getFaceEmbedding( bitmap , face.boundingBox , true )
-                                Log.i( "Model" , "New frame received.")
+            val inputImage = InputImage.fromByteArray(
+                BitmaptoNv21(bitmap),
+                640,
+                480,
+                90,
+                IMAGE_FORMAT_NV21
+            )
 
-                                // Compute L2 norms and store them.
-                                val norms = FloatArray( faceList.size )
-                                for ( i in 0 until faceList.size ) {
-                                    norms[ i ] = L2Norm( subject , faceList[ i ].second )
-                                }
-                                // Calculate the minimum L2 distance from the stored L2 norms.
-                                val prediction = faceList[ norms.indexOf( norms.min()!! ) ]
-                                val minDistanceName = prediction.first
-                                val minDistance = norms.min()!!
+            faceDetector.process(inputImage).addOnSuccessListener { faces ->
+                // Start a new thread to avoid frequent lags.
+                Thread {
+                    val predictions = ArrayList<Prediction>()
+                    for (face in faces) {
+                        try {
+                            // Crop the frame using face.boundingBox.
+                            // Convert the cropped Bitmap to a ByteBuffer.
+                            // Finally, feed the ByteBuffer to the FaceNet model.
+                            val subject = model.getFaceEmbedding(bitmap, face.boundingBox, true)
+                            Log.i("Model", "New frame received.")
 
-                                Log.i( "Model" , "Person identified as ${minDistanceName} with " +
-                                        "confidence of ${minDistance * 100} %" )
-                                // Push the results in form of a Prediction.
-                                predictions.add(
-                                        Prediction(
-                                                face.boundingBox,
-                                                minDistanceName
-                                        )
+                            // Compute L2 norms and store them.
+                            val norms = FloatArray(faceList.size)
+                            for (i in 0 until faceList.size) {
+                                norms[i] = L2Norm(subject, faceList[i].second)
+                            }
+                            // Calculate the minimum L2 distance from the stored L2 norms.
+                            val prediction = faceList[norms.indexOf(norms.min()!!)]
+                            val minDistanceName = prediction.first
+                            val minDistance = norms.min()!!
+
+                            Log.i(
+                                "Model", "Person identified as ${minDistanceName} with " +
+                                        "confidence of ${minDistance * 100} %"
+                            )
+                            // Push the results in form of a Prediction.
+                            predictions.add(
+                                Prediction(
+                                    face.boundingBox,
+                                    minDistanceName
                                 )
-                            }
-                            catch ( e : Exception ) {
-                                // If any exception occurs with this box and continue with the next boxes.
-                                continue
-                            }
+                            )
+                        } catch (e: Exception) {
+                            // If any exception occurs with this box and continue with the next boxes.
+                            continue
                         }
+                    }
 
-                        // Clear the BoundingBoxOverlay and set the new results ( boxes ) to be displayed.
-                        boundingBoxOverlay.faceBoundingBoxes = predictions
-                        boundingBoxOverlay.invalidate()
+                    // Clear the BoundingBoxOverlay and set the new results ( boxes ) to be displayed.
+                    boundingBoxOverlay.faceBoundingBoxes = predictions
+                    boundingBoxOverlay.invalidate()
 
-                        // Declare that the processing has been finished and the system is ready for the next frame.
-                        isProcessing.set(false)
+                    // Declare that the processing has been finished and the system is ready for the next frame.
+                    isProcessing.set(false)
 
-                    }.start()
-                }
+                }.start()
+            }
                 .addOnFailureListener { e ->
                     Log.e("Error", e.message)
                 }
@@ -118,34 +127,36 @@ class FrameAnalyser( private var context: Context , private var boundingBoxOverl
 
     private fun saveBitmap(image: Bitmap, name: String) {
         val fileOutputStream =
-            FileOutputStream(File( Environment.getExternalStorageDirectory()!!.absolutePath + "/$name.png"))
+            FileOutputStream(File(Environment.getExternalStorageDirectory()!!.absolutePath + "/$name.png"))
         image.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
     }
 
     // Compute the L2 norm of ( x2 - x1 )
-    private fun L2Norm(x1 : FloatArray, x2 : FloatArray ) : Float {
+    private fun L2Norm(x1: FloatArray, x2: FloatArray): Float {
         var sum = 0.0f
-        for( i in x1.indices ) {
-            sum += ( x1[i] - x2[i] ).pow( 2 )
+        for (i in x1.indices) {
+            sum += (x1[i] - x2[i]).pow(2)
         }
-        return sqrt( sum )
+        return sqrt(sum)
     }
 
 
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
-        0 -> FirebaseVisionImageMetadata.ROTATION_0
-        90 -> FirebaseVisionImageMetadata.ROTATION_90
-        180 -> FirebaseVisionImageMetadata.ROTATION_180
-        270 -> FirebaseVisionImageMetadata.ROTATION_270
-        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
-    }
+//    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
+//        0 -> FirebaseVisionImageMetadata.ROTATION_0
+//        90 -> FirebaseVisionImageMetadata.ROTATION_90
+//        180 -> FirebaseVisionImageMetadata.ROTATION_180
+//        270 -> FirebaseVisionImageMetadata.ROTATION_270
+//        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
+//    }
 
-    private fun BitmaptoNv21( bitmap: Bitmap ): ByteArray {
-        val argb = IntArray(bitmap.width * bitmap.height )
+    private fun BitmaptoNv21(bitmap: Bitmap): ByteArray {
+        val argb = IntArray(bitmap.width * bitmap.height)
         bitmap.getPixels(argb, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
-        val yuv = ByteArray(bitmap.height * bitmap.width + 2 * Math.ceil(bitmap.height / 2.0).toInt()
-                * Math.ceil(bitmap.width / 2.0).toInt())
-        encodeYUV420SP( yuv, argb, bitmap.width, bitmap.height)
+        val yuv = ByteArray(
+            bitmap.height * bitmap.width + 2 * Math.ceil(bitmap.height / 2.0).toInt()
+                    * Math.ceil(bitmap.width / 2.0).toInt()
+        )
+        encodeYUV420SP(yuv, argb, bitmap.width, bitmap.height)
         return yuv
     }
 
@@ -178,7 +189,7 @@ class FrameAnalyser( private var context: Context , private var boundingBoxOverl
         }
     }
 
-    private fun toBitmap( image : Image ): Bitmap {
+    private fun toBitmap(image: Image): Bitmap {
         val yBuffer = image.planes[0].buffer
         val uBuffer = image.planes[1].buffer
         val vBuffer = image.planes[2].buffer
