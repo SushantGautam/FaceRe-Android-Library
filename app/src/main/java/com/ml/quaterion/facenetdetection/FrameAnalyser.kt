@@ -2,8 +2,10 @@ package com.ml.quaterion.facenetdetection
 
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
 import android.media.Image
 import android.os.Environment
+import android.util.DisplayMetrics
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -17,6 +19,7 @@ import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.pow
 import kotlin.math.sqrt
+
 
 // Analyser class to process frames and produce detections.
 class FrameAnalyser(
@@ -49,12 +52,22 @@ class FrameAnalyser(
     // FaceNet model utility class
     private val model = FaceNetModel(context)
 
+
+    fun flip(d: Bitmap): BitmapDrawable {
+        val m = Matrix()
+        m.preScale((-1).toFloat(), 1F)
+        val src = d
+        val dst = Bitmap.createBitmap(src, 0, 0, src.width, src.height, m, false)
+        dst.density = DisplayMetrics.DENSITY_DEFAULT
+        return BitmapDrawable(dst)
+    }
+
     // Here's where we receive our frames.
     override fun analyze(image: ImageProxy?, rotationDegrees: Int) {
 
         // android.media.Image -> android.graphics.Bitmap
-        val bitmap = toBitmap(image?.image!!)
-
+        var bitmap = toBitmap(image?.image!!)
+        bitmap = flip(bitmap).bitmap
         // If the previous frame is still being processed, then skip this frame
         if (isProcessing.get()) {
             return
@@ -67,7 +80,7 @@ class FrameAnalyser(
                 BitmaptoNv21(bitmap),
                 640,
                 480,
-                90,
+                0,
                 IMAGE_FORMAT_NV21
             )
 
