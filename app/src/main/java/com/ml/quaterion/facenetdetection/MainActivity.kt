@@ -168,8 +168,8 @@ class MainActivity : AppCompatActivity() {
     // Start the camera preview once the permissions are granted.
     private fun startCamera() {
         val previewConfig = PreviewConfig.Builder().apply {
-            setTargetResolution(Size(640, 480))
-            setLensFacing(CameraX.LensFacing.BACK)
+//            setTargetResolution(Size(640, 480))
+            setLensFacing(CameraX.LensFacing.FRONT)
         }.build()
         val preview = Preview(previewConfig)
         preview.setOnPreviewOutputUpdateListener {
@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity() {
             setImageReaderMode(
                 ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE
             )
-            setLensFacing(CameraX.LensFacing.BACK)
+            setLensFacing(CameraX.LensFacing.FRONT)
 
         }.build()
         val analyzerUseCase = ImageAnalysis(analyzerConfig).apply {
