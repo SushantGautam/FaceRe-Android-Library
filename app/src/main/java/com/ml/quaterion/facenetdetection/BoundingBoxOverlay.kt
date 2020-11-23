@@ -58,7 +58,7 @@ class BoundingBoxOverlay( context: Context , attributeSet: AttributeSet )
                 // Draw boxes and text
                 canvas?.drawRoundRect( processedBbox , 16f , 16f , boxPaint )
                 canvas?.drawText(
-                    face.label ,
+                    face.label + ": "+ (face.minDistance).toString(),
                     processedBbox.centerX() ,
                     processedBbox.centerY() ,
                     textPaint

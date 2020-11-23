@@ -114,7 +114,8 @@ class FrameAnalyser(
                             predictions.add(
                                 Prediction(
                                     face.boundingBox,
-                                    minDistanceName
+                                    minDistanceName,
+                                    minDistance
                                 )
                             )
                         } catch (e: Exception) {

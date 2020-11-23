@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Environment
-import android.util.Size
 import android.view.Surface
 import android.view.TextureView
 import android.view.ViewGroup
@@ -25,6 +24,9 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection.getClient
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.io.File
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
@@ -91,6 +93,8 @@ class MainActivity : AppCompatActivity() {
         ) {
             // Read image data
             scanStorageForImages()
+
+
         }
     }
 
@@ -106,24 +110,64 @@ class MainActivity : AppCompatActivity() {
             val imagesDir =
                 File(Environment.getExternalStorageDirectory()!!.absolutePath + "/images")
             val imageSubDirs = imagesDir.listFiles()
-            if (imageSubDirs == null) {
-                Toast.makeText(
-                    this,
-                    "Could not read images. Make sure you've have a folder as described in the README",
-                    Toast.LENGTH_LONG
-                ).show()
-                return
-            } else {
-                for (imageSubDir in imagesDir.listFiles()) {
-                    for (image in imageSubDir.listFiles()) {
-                        imageLabelPairs.add(
-                            Pair(BitmapFactory.decodeFile(image.absolutePath), imageSubDir.name)
-                        )
-                    }
+
+
+            LoadImageToCompare(
+                URL("https://4.bp.blogspot.com/-Jm0iUsF3wjY/WPSi7UXx-nI/AAAAAAAACAM/tkVRFUFcNykqTLjnx_cSkiR2CPX_94ZUwCLcB/s1600/Sushant%2BGautam.jpg"),
+                "Sushant"
+
+            )
+
+
+//
+//            if (imageSubDirs == null) {
+//                Toast.makeText(
+//                    this,
+//                    "Could not read images. Make sure you've have a folder as described in the README",
+//                    Toast.LENGTH_LONG
+//                ).show()
+//                return
+//            } else {
+//
+//                for (imageSubDir in imagesDir.listFiles()) {
+//                    for (image in imageSubDir.listFiles()) {
+//                        imageLabelPairs.add(
+//                            Pair(BitmapFactory.decodeFile(image.absolutePath), imageSubDir.name)
+//                        )
+//                    }
+//                }
+//
+//            }
+
+
+        }
+    }
+
+
+    private fun LoadImageToCompare(ulrn: URL, FaceName: String) {
+
+        val s = Thread {
+            try {
+                val con = ulrn.openConnection() as HttpURLConnection
+                val iss: InputStream = con.getInputStream()
+                val bmp = BitmapFactory.decodeStream(iss)
+                if (null != bmp) {
+                    imageLabelPairs.add(
+                        Pair(bmp, FaceName)
+                    )
+                    print("Success")
                 }
+
+            } catch (e: java.lang.Exception) {
+                print("Error")
+                e.printStackTrace()
+            } finally {
                 scanImage(0)
             }
         }
+
+        s.start()
+
     }
 
     private fun scanImage(counter: Int) {
