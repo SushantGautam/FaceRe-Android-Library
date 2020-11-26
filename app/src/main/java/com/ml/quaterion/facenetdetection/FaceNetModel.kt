@@ -30,9 +30,12 @@ class FaceNetModel(context: Context) {
         )
     }
 
+
+
+    // Gets an face embedding using FaceNet
     // Gets an face embedding using FaceNet
     fun getFaceEmbedding(image: Bitmap, crop: Rect, preRotate: Boolean): FloatArray {
-        var s = runFaceNet(
+        val s = runFaceNet(
             convertBitmapToBuffer(
                 cropRectFromBitmap(image, crop, preRotate)
             )
@@ -41,12 +44,15 @@ class FaceNetModel(context: Context) {
     }
 
     fun getFaceEmbeddingWithoutBBox(image: Bitmap, preRotate: Boolean): FloatArray {
-        val s = convertBitmapToBuffer(
-            Bitmap.createScaledBitmap(image, 160, 160, false)
+        var s = runFaceNet(
+            convertBitmapToBuffer(
+                Bitmap.createScaledBitmap(image, 160, 160, false)
+            )
         )
-        return runFaceNet(
-            s
-        )[0]
+
+        return s[0]
+
+
     }
 
     // Run the FaceNet model.
@@ -86,7 +92,7 @@ class FaceNetModel(context: Context) {
             height = source.height - rect.top
         }
         val croppedBitmap = Bitmap.createBitmap(
-            if (preRotate) rotateBitmap(source, 90f)!! else source,
+            if (preRotate) rotateBitmap(source, 270f)!! else source,
             rect.left,
             rect.top,
             width,

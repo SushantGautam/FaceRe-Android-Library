@@ -93,7 +93,7 @@ class FrameAnalyser(
                             // Crop the frame using face.boundingBox.
                             // Convert the cropped Bitmap to a ByteBuffer.
                             // Finally, feed the ByteBuffer to the FaceNet model.
-                            val subject = model.getFaceEmbedding(bitmap, face.boundingBox, true)
+                            val subject = model.getFaceEmbedding(bitmap, face.boundingBox, false)
                             Log.i("Model", "New frame received.")
 
                             // Compute L2 norms and store them.

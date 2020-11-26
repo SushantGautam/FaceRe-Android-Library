@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var frameAnalyser: FrameAnalyser
 
     // Use Firebase MLKit to crop faces from images present in "/images" folder.
-    private val cropWithBBoxes: Boolean = false
+    private val cropWithBBoxes: Boolean = true
 
     // Initialize Firebase MLKit Face Detector
     private val accurateOps = FaceDetectorOptions.Builder()
@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
 
 
             LoadImageToCompare(
-                URL("https://4.bp.blogspot.com/-Jm0iUsF3wjY/WPSi7UXx-nI/AAAAAAAACAM/tkVRFUFcNykqTLjnx_cSkiR2CPX_94ZUwCLcB/s1600/Sushant%2BGautam.jpg"),
+                URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
                 "Sushant"
 
             )
