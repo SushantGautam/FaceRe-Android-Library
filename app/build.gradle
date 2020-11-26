@@ -8,7 +8,7 @@ android {
     buildToolsVersion "29.0.2"
 
     defaultConfig {
-        applicationId "com.ml.facenetdetection"
+        applicationId "com.ubl.FaceRe"
         minSdkVersion 28
         targetSdkVersion 30
         versionCode 1
