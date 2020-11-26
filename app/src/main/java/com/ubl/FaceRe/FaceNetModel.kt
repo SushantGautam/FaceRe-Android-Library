@@ -31,7 +31,6 @@ class FaceNetModel(context: Context) {
     }
 
 
-
     // Gets an face embedding using FaceNet
     // Gets an face embedding using FaceNet
     fun getFaceEmbedding(image: Bitmap, crop: Rect, preRotate: Boolean): FloatArray {
