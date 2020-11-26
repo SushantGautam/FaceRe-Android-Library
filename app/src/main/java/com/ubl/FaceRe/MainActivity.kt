@@ -1,4 +1,4 @@
-package com.ml.quaterion.facenetdetection
+package com.ubl.FaceRe
 
 import android.Manifest
 import android.app.ProgressDialog

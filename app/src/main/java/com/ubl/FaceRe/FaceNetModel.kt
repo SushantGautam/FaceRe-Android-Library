@@ -1,4 +1,4 @@
-package com.ml.quaterion.facenetdetection
+package com.ubl.FaceRe
 
 import android.content.Context
 import android.graphics.Bitmap

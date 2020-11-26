@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ml.quaterion.facenetdetection">
+    package="com.ubl.FaceRe">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -22,7 +22,7 @@
             android:value="face" />
 
         <activity
-            android:name="com.ml.quaterion.facenetdetection.MainActivity"
+            android:name="com.ubl.FaceRe.MainActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
