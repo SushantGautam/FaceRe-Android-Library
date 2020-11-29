@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.view.Surface
 import android.view.TextureView
-
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
@@ -24,7 +23,6 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection.getClient
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.ubl.FaceRe.*
-
 import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
@@ -75,7 +73,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-
         // Implementation of CameraX preview
         cameraTextureView = findViewById(R.id.camera_textureView)
         val boundingBoxOverlay = findViewById<BoundingBoxOverlay>(R.id.bbox_overlay)
@@ -99,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             PackageManager.PERMISSION_GRANTED
         ) {
             // Read image data
-           scanStorageForImages()
+            scanStorageForImages()
         }
     }
 
@@ -214,7 +211,6 @@ class MainActivity : AppCompatActivity() {
     // Start the camera preview once the permissions are granted.
     private fun startCamera() {
         val previewConfig = PreviewConfig.Builder().apply {
-//            setTargetResolution(Size(640, 480))
             setLensFacing(CameraX.LensFacing.FRONT)
         }.build()
         val preview = Preview(previewConfig)
@@ -254,6 +250,8 @@ class MainActivity : AppCompatActivity() {
             else -> return
         }
         matrix.postRotate(-rotationDegrees.toFloat(), centerX, centerY)
+        matrix.postScale(2f, 1f)
+        matrix.postTranslate(-centerX, 0f)
         cameraTextureView.setTransform(matrix)
     }
 
@@ -264,7 +262,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                cameraTextureView.post {startCamera() }
+                cameraTextureView.post { startCamera() }
                 scanStorageForImages()
             }
         }
