@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 
+
 // Defines an overlay on which the boxes and text will be drawn.
 class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
     SurfaceView(context, attributeSet), SurfaceHolder.Callback {
@@ -44,14 +45,14 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
         color = Color.WHITE
     }
 
-    override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-    }
-
-    override fun surfaceDestroyed(holder: SurfaceHolder?) {
-    }
-
-    override fun surfaceCreated(holder: SurfaceHolder?) {
-    }
+//    override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+//    }
+//
+//    override fun surfaceDestroyed(holder: SurfaceHolder?) {
+//    }
+//
+//    override fun surfaceCreated(holder: SurfaceHolder?) {
+//    }
 
     override fun onDraw(canvas: Canvas?) {
         if (faceBoundingBoxes != null) {
@@ -75,6 +76,18 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
         val rectf = RectF(bbox)
         output2OverlayTransform.mapRect(rectf)
         return rectf
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        TODO("Not yet implemented")
+    }
+
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun surfaceDestroyed(holder: SurfaceHolder) {
+        TODO("Not yet implemented")
     }
 
 

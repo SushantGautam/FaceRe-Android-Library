@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.media.Image
+import android.os.Build
 import android.os.Environment
 import android.util.DisplayMetrics
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.common.InputImage
@@ -63,6 +65,7 @@ class FrameAnalyser(
     }
 
     // Here's where we receive our frames.
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun analyze(image: ImageProxy?, rotationDegrees: Int) {
 
         // android.media.Image -> android.graphics.Bitmap
@@ -134,7 +137,7 @@ class FrameAnalyser(
                 }.start()
             }
                 .addOnFailureListener { e ->
-                    Log.e("Error", e.message)
+                    Log.e("Error", e.message.toString())
                 }
         }
     }
@@ -203,6 +206,7 @@ class FrameAnalyser(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun toBitmap(image: Image): Bitmap {
         val yBuffer = image.planes[0].buffer
         val uBuffer = image.planes[1].buffer
@@ -220,5 +224,5 @@ class FrameAnalyser(
         val yuv = out.toByteArray()
         return BitmapFactory.decodeByteArray(yuv, 0, yuv.size)
     }
-
 }
+

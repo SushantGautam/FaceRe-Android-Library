@@ -1,4 +1,4 @@
-package com.ubl.FaceRe
+package com.ubl.FaceReApp
 
 import android.Manifest
 import android.app.ProgressDialog
@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.view.Surface
 import android.view.TextureView
+
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
@@ -18,23 +19,27 @@ import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnSuccessListener
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_NV21
+import com.google.mlkit.vision.common.InputImage.*
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection.getClient
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.ubl.FaceRe.*
+
 import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
+import com.google.mlkit.vision.common.InputImage.fromByteArray as fromByteArray1
+
 
 class MainActivity : AppCompatActivity() {
 
     private val REQUEST_CODE_PERMISSIONS = 10
-    private val REQUIRED_PERMISSIONS =
-        arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private lateinit var cameraTextureView: TextureView
+
+    //library bata
     private lateinit var frameAnalyser: FrameAnalyser
 
     // Use Firebase MLKit to crop faces from images present in "/images" folder.
@@ -66,10 +71,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FaceRecog().init(this.application)
         setContentView(R.layout.activity_main)
 
-        // Implementation of CameraX preview
 
+
+        // Implementation of CameraX preview
         cameraTextureView = findViewById(R.id.camera_textureView)
         val boundingBoxOverlay = findViewById<BoundingBoxOverlay>(R.id.bbox_overlay)
         logTextView = findViewById(R.id.logTextView)
@@ -92,9 +99,7 @@ class MainActivity : AppCompatActivity() {
             PackageManager.PERMISSION_GRANTED
         ) {
             // Read image data
-            scanStorageForImages()
-
-
+           scanStorageForImages()
         }
     }
 
@@ -102,20 +107,18 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
             PackageManager.PERMISSION_GRANTED
         ) {
-            progressDialog = ProgressDialog(this)
-            progressDialog?.setMessage("Loading images ...")
-            progressDialog?.setCancelable(false)
-            progressDialog?.show()
+//            progressDialog = ProgressDialog(this)
+//            progressDialog?.setMessage("Loading images ...")
+//            progressDialog?.setCancelable(false)
+//            progressDialog?.show()
             model = FaceNetModel(this)
             val imagesDir =
                 File(Environment.getExternalStorageDirectory()!!.absolutePath + "/images")
             val imageSubDirs = imagesDir.listFiles()
 
-
             LoadImageToCompare(
                 URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
                 "Sushant"
-
             )
 
 
@@ -142,7 +145,6 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
-
 
     private fun LoadImageToCompare(ulrn: URL, FaceName: String) {
 
@@ -173,7 +175,7 @@ class MainActivity : AppCompatActivity() {
     private fun scanImage(counter: Int) {
         val sample = imageLabelPairs[counter]
 
-        val inputImage = InputImage.fromByteArray(
+        val inputImage = fromByteArray1(
             bitmapToNV21(sample.first),
             sample.first.width,
             sample.first.height,
@@ -262,7 +264,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                cameraTextureView.post { startCamera() }
+                cameraTextureView.post {startCamera() }
                 scanStorageForImages()
             }
         }
