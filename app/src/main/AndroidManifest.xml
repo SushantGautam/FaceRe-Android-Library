@@ -22,7 +22,7 @@
             android:value="face" />
 
         <activity
-            android:name="com.ubl.FaceReApp.FaceReActivity"
+            android:name="com.ubl.FaceReApp.MainActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.ubl.FaceReApp.MainActivity"
+            android:name="com.ubl.FaceReApp.FaceReActivity"
             android:screenOrientation="landscape">
         </activity>
     </application>

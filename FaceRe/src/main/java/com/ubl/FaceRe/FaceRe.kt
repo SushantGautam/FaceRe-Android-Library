@@ -14,6 +14,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.reflect.KFunction0
 
 
 class FaceRe {
@@ -45,7 +46,14 @@ class FaceRe {
         return model
     }
 
-    fun InitializeFrame(boundingBoxOverlay: BoundingBoxOverlay, context: Context): FrameAnalyser {
+     lateinit var toastVar : KFunction0<Unit>
+
+    fun InitializeFrame(
+        boundingBoxOverlay: BoundingBoxOverlay,
+        context: Context,
+        ToastFunction: KFunction0<Unit>
+    ): FrameAnalyser {
+        toastVar = ToastFunction
         frameAnalyser = FrameAnalyser(context, boundingBoxOverlay)
         return frameAnalyser
     }

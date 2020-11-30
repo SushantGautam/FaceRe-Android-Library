@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.ProgressDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.TextureView
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -60,7 +61,7 @@ class FaceReActivity : AppCompatActivity() {
         boundingBoxOverlay.setWillNotDraw(false)
         boundingBoxOverlay.setZOrderOnTop(true)
 //        frameAnalyser = FrameAnalyser(this, boundingBoxOverlay)
-        faceRe.InitializeFrame(boundingBoxOverlay, this)
+        faceRe.InitializeFrame(boundingBoxOverlay, this, ::ToastFunction)
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
@@ -69,6 +70,11 @@ class FaceReActivity : AppCompatActivity() {
             // Read image data
             LoadImageToCompare()
         }
+    }
+
+    fun ToastFunction() {
+        Log.d("Bidhan", "My nameis bidhan")
+        return
     }
 
     private fun LoadImageToCompare() {

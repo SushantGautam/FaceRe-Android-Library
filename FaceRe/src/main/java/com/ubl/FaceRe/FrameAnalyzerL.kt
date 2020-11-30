@@ -120,6 +120,8 @@ class FrameAnalyser(
                                     accuracy
                                 )
                             )
+                            FaceRe().toastVar()
+
                         } catch (e: Exception) {
                             // If any exception occurs with this box and continue with the next boxes.
                             continue
