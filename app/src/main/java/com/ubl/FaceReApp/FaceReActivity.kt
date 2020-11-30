@@ -67,11 +67,11 @@ class FaceReActivity : AppCompatActivity() {
             PackageManager.PERMISSION_GRANTED
         ) {
             // Read image data
-            scanStorageForImages()
+            LoadImageToCompare()
         }
     }
 
-    private fun scanStorageForImages() {
+    private fun LoadImageToCompare() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
             PackageManager.PERMISSION_GRANTED
         ) {
@@ -82,6 +82,7 @@ class FaceReActivity : AppCompatActivity() {
             )
 
             //load bitmap example
+//            faceRe.LoadBitmapToCompare(bmp: Bitmap, FaceName: "Sushant")
 
         }
     }
@@ -126,7 +127,7 @@ class FaceReActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 cameraTextureView.post { startCamera() }
-                scanStorageForImages()
+                LoadImageToCompare()
             }
         }
     }
