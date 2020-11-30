@@ -21,12 +21,14 @@ import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.reflect.KFunction0
 
 
 // Analyser class to process frames and produce detections.
 class FrameAnalyser(
     private var context: Context,
-    private var boundingBoxOverlay: BoundingBoxOverlay
+    private var boundingBoxOverlay: BoundingBoxOverlay,
+    private var facere: FaceRe?
 ) : ImageAnalysis.Analyzer {
 
     // Configure the FirebaseVisionFaceDetector
@@ -64,9 +66,14 @@ class FrameAnalyser(
         return BitmapDrawable(dst)
     }
 
+
     // Here's where we receive our frames.
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun analyze(image: ImageProxy?, rotationDegrees: Int) {
+
+
+        val callbackAfterComplete: KFunction0<Unit>
+        callbackAfterComplete = facere?.successCallback!!;
 
         // android.media.Image -> android.graphics.Bitmap
         var bitmap = toBitmap(image?.image!!)
@@ -120,7 +127,7 @@ class FrameAnalyser(
                                     accuracy
                                 )
                             )
-                            FaceRe().toastVar()
+                            callbackAfterComplete()
 
                         } catch (e: Exception) {
                             // If any exception occurs with this box and continue with the next boxes.

@@ -32,6 +32,7 @@ class FaceRe {
 
 
     lateinit var frameAnalyser: FrameAnalyser
+    var RearCamera = false
 
     var imageLabelPairs = ArrayList<Pair<Bitmap, String>>()
 
@@ -41,20 +42,21 @@ class FaceRe {
         .build()
     private val detector = FaceDetection.getClient(accurateOps)
 
-    fun IntializeModel(context: Context): FaceNetModel? {
+    fun IntializeModel(context: Context, rearCamera: Boolean = false): FaceNetModel? {
         model = FaceNetModel(context)
+        RearCamera = rearCamera
         return model
     }
 
-     lateinit var toastVar : KFunction0<Unit>
+    lateinit var successCallback: KFunction0<Unit>
 
     fun InitializeFrame(
         boundingBoxOverlay: BoundingBoxOverlay,
         context: Context,
         ToastFunction: KFunction0<Unit>
     ): FrameAnalyser {
-        toastVar = ToastFunction
-        frameAnalyser = FrameAnalyser(context, boundingBoxOverlay)
+        successCallback = ToastFunction
+        frameAnalyser = FrameAnalyser(context, boundingBoxOverlay, this)
         return frameAnalyser
     }
 
@@ -64,7 +66,7 @@ class FaceRe {
             imageLabelPairs.add(
                 Pair(bmp, FaceName)
             )
-        }finally {
+        } finally {
             scanImage(0)
         }
     }

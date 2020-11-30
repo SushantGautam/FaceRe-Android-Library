@@ -41,7 +41,7 @@ class FaceReActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_re)
 
-        faceRe.IntializeModel(this)
+        faceRe.IntializeModel(this, rearCamera = false)
 
         // Implementation of CameraX preview
         cameraTextureView = findViewById(R.id.camera_textureView)
@@ -61,7 +61,7 @@ class FaceReActivity : AppCompatActivity() {
         boundingBoxOverlay.setWillNotDraw(false)
         boundingBoxOverlay.setZOrderOnTop(true)
 //        frameAnalyser = FrameAnalyser(this, boundingBoxOverlay)
-        faceRe.InitializeFrame(boundingBoxOverlay, this, ::ToastFunction)
+        faceRe.InitializeFrame(boundingBoxOverlay, this, ::SuccessCallbackFunction)
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
@@ -72,7 +72,7 @@ class FaceReActivity : AppCompatActivity() {
         }
     }
 
-    fun ToastFunction() {
+    fun SuccessCallbackFunction() {
         Log.d("Bidhan", "My nameis bidhan")
         return
     }
