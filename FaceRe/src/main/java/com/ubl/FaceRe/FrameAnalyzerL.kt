@@ -106,19 +106,18 @@ class FrameAnalyser(
                             }
                             // Calculate the minimum L2 distance from the stored L2 norms.
                             val prediction = faceList[norms.indexOf(norms.min()!!)]
-                            val minDistanceName = prediction.first
-                            val minDistance = norms.min()!!
-
+                            val detectedFaceName = prediction.first
+                            val accuracy = String.format("%.2f", NormToAccuracy(norms.min()!!))
                             Log.i(
-                                "Model", "Person identified as ${minDistanceName} with " +
-                                        "confidence of ${minDistance * 100} %"
+                                "Model", "Person identified as ${detectedFaceName} with " +
+                                        "confidence of ${accuracy} %"
                             )
                             // Push the results in form of a Prediction.
                             predictions.add(
                                 Prediction(
                                     face.boundingBox,
-                                    minDistanceName,
-                                    minDistance
+                                    detectedFaceName,
+                                    accuracy
                                 )
                             )
                         } catch (e: Exception) {
@@ -141,6 +140,7 @@ class FrameAnalyser(
                 }
         }
     }
+
 
     private fun saveBitmap(image: Bitmap, name: String) {
         val fileOutputStream =
