@@ -53,9 +53,9 @@ class FaceRe {
     fun InitializeFrame(
         boundingBoxOverlay: BoundingBoxOverlay,
         context: Context,
-        ToastFunction: KFunction0<Unit>
+        callbackFunc: KFunction0<Unit>
     ): FrameAnalyser {
-        successCallback = ToastFunction
+        successCallback = callbackFunc
         frameAnalyser = FrameAnalyser(context, boundingBoxOverlay, this)
         return frameAnalyser
     }
