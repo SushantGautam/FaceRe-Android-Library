@@ -124,6 +124,7 @@ class FrameAnalyser(
 
                         } catch (e: Exception) {
                             // If any exception occurs with this box and continue with the next boxes.
+                            print(e)
                             continue
                         }
                     }
