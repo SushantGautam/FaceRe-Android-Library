@@ -31,6 +31,8 @@ class FrameAnalyser(
     private var facere: FaceRe?
 ) : ImageAnalysis.Analyzer {
 
+    private val useL2Norm = false
+
     // Configure the FirebaseVisionFaceDetector
     private val realTimeOpts = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -109,12 +111,21 @@ class FrameAnalyser(
                             // Compute L2 norms and store them.
                             val norms = FloatArray(faceList.size)
                             for (i in 0 until faceList.size) {
-                                norms[i] = L2Norm(subject, faceList[i].second)
+                                if (useL2Norm)
+                                    norms[i] = L2Norm(subject, faceList[i].second)
+                                else
+                                    norms[i] = cosineSimilarity(subject, faceList[i].second)
                             }
                             // Calculate the minimum L2 distance from the stored L2 norms.
                             val prediction = faceList[norms.indexOf(norms.min()!!)]
                             val detectedFaceName = prediction.first
-                            val accuracy = String.format("%.2f", NormToAccuracy(norms.min()!!))
+                            val scoreRaw: Float = norms.min()!!
+                            val score: Float
+                            if (useL2Norm)
+                                score = NormToAccuracy(scoreRaw)
+                            else
+                                score = CosineSimilarityToAccuracy(scoreRaw)
+                            val accuracy = String.format("%.2f", score) + " Or:" + scoreRaw
                             Log.i(
                                 "Model", "Person identified as ${detectedFaceName} with " +
                                         "confidence of ${accuracy} %"
@@ -165,6 +176,23 @@ class FrameAnalyser(
             sum += (x1[i] - x2[i]).pow(2)
         }
         return sqrt(sum)
+    }
+
+
+    // Cosine similarity for two vectors ( face embeddings ).
+    // cosineSimilarity = embedding1.dot( embedding2 ) / ||embedding1|| * ||embedding2||
+    private fun cosineSimilarity(x1: FloatArray, x2: FloatArray): Float {
+        var dotProduct = 0.0f
+        var mag1 = 0.0f
+        var mag2 = 0.0f
+        for (i in x1.indices) {
+            dotProduct += (x1[i] * x2[i])
+            mag1 += x1[i].toDouble().pow(2.0).toFloat()
+            mag2 += x2[i].toDouble().pow(2.0).toFloat()
+        }
+        mag1 = sqrt(mag1)
+        mag2 = sqrt(mag2)
+        return dotProduct / (mag1 * mag2)
     }
 
 
