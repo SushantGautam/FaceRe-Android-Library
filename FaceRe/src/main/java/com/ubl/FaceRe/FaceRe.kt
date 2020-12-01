@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.view.Surface
 import android.view.TextureView
+import android.view.View
+import android.widget.TextView
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
@@ -49,15 +51,18 @@ class FaceRe {
     }
 
     lateinit var successCallback: KFunction0<Unit>
+    lateinit var ActivityResources: Map<String, View>
 
     fun InitializeFrame(
         boundingBoxOverlay: BoundingBoxOverlay,
         context: Context,
-        callbackFunc: KFunction0<Unit>
+        callbackFunc: KFunction0<Unit>,
+        resources: Map<String, TextView>
     ): FrameAnalyser {
         successCallback = callbackFunc
         frameAnalyser = FrameAnalyser(context, boundingBoxOverlay, this)
         frameAnalyser.startTimeCounter(context)
+        ActivityResources = resources
         return frameAnalyser
     }
 

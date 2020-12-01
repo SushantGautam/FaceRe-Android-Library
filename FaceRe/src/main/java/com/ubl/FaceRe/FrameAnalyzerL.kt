@@ -1,15 +1,14 @@
 package com.ubl.FaceRe
 
-import android.app.AlertDialog
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.media.Image
-import android.os.Build
-import android.os.CountDownTimer
-import android.os.Environment
+import android.os.*
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.camera.core.ImageAnalysis
@@ -60,16 +59,17 @@ class FrameAnalyser(
             override fun onTick(millisUntilFinished: Long) {
                 counter++
             }
+
             override fun onFinish() {
-                var finalAverage = summation/frameCounter
-                if(finalAverage< maxScore){
+                var finalAverage = summation / frameCounter
+                if (finalAverage < maxScore) {
                     callbackAfterComplete()
                     Toast.makeText(
                         this@FrameAnalyser.context,
                         "Average score is too low $finalAverage",
                         Toast.LENGTH_LONG
                     ).show()
-                }else {
+                } else {
                     Toast.makeText(
                         this@FrameAnalyser.context,
                         "Average score is Good $finalAverage",
@@ -151,7 +151,8 @@ class FrameAnalyser(
                                 score = NormToAccuracy(scoreRaw)
                             else
                                 score = CosineSimilarityToAccuracy(scoreRaw)
-                            val accuracy = String.format("%.2f", score) + " Or:" + scoreRaw
+                            val accuracyToShowInBBox =
+                                String.format("%.2f", score) + " Or:" + scoreRaw
 
                             frameCounter++
                             accuracyScore = score.toDouble()
@@ -162,16 +163,30 @@ class FrameAnalyser(
 
                             Log.i(
                                 "Model", "Person identified as ${detectedFaceName} with " +
-                                        "confidence of ${accuracy} %"
+                                        "confidence of ${accuracyToShowInBBox} %"
                             )
                             // Push the results in form of a Prediction.
-                            predictions.add(
+                            val add = predictions.add(
                                 Prediction(
                                     face.boundingBox,
                                     detectedFaceName,
-                                    accuracy
+                                    accuracyToShowInBBox
                                 )
                             )
+
+
+
+                            Handler(Looper.getMainLooper()).post {
+                                (facere?.ActivityResources?.get("accuracy") as TextView).text =
+                                    String.format("%.2f", score) + "%"
+
+                                (facere?.ActivityResources?.get("skip"))!!.visibility =
+                                    View.VISIBLE
+
+                                (facere?.ActivityResources?.get("retry"))!!.visibility =
+                                    View.VISIBLE
+                            }
+
 
                         } catch (e: Exception) {
                             // If any exception occurs with this box and continue with the next boxes.

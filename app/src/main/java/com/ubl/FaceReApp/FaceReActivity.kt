@@ -6,10 +6,11 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
@@ -65,7 +66,16 @@ class FaceReActivity : AppCompatActivity() {
         boundingBoxOverlay.setWillNotDraw(false)
         boundingBoxOverlay.setZOrderOnTop(true)
 //        frameAnalyser = FrameAnalyser(this, boundingBoxOverlay)
-        faceRe.InitializeFrame(boundingBoxOverlay, this, ::SuccessCallbackFunction)
+
+        val resources = mapOf(
+            "accuracy" to findViewById(R.id.latestaccuracy) as TextView,
+            "retry" to findViewById(R.id.retry) as Button,
+            "skip" to findViewById(R.id.skip) as Button
+        )
+
+
+
+        faceRe.InitializeFrame(boundingBoxOverlay, this, ::SuccessCallbackFunction, resources)
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
@@ -88,19 +98,21 @@ class FaceReActivity : AppCompatActivity() {
 
         //set negative button
         builder.setPositiveButton(
-            "Update Now") { dialog, id ->
+            "Update Now"
+        ) { dialog, id ->
             // User clicked Update Now button
             Toast.makeText(view, "Updating your device", Toast.LENGTH_SHORT).show()
         }
 
         //set positive button
         builder.setNegativeButton(
-            "Cancel") { dialog, id ->
+            "Cancel"
+        ) { dialog, id ->
             // User cancelled the dialog
         }
 
         //set neutral button
-        builder.setNeutralButton("Reminder me latter") {dialog, id->
+        builder.setNeutralButton("Reminder me latter") { dialog, id ->
             // User Click on reminder me latter
         }
         builder.show()
