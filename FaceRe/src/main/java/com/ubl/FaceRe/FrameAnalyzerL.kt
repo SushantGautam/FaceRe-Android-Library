@@ -154,7 +154,7 @@ class FrameAnalyser(
                             val accuracy = String.format("%.2f", score) + " Or:" + scoreRaw
 
                             frameCounter++
-                            accuracyScore = accuracy.toDouble()
+                            accuracyScore = score.toDouble()
                             summation += accuracyScore
 
                             Log.d("average score", "$summation")
