@@ -20,6 +20,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.time.LocalTime
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -35,8 +36,9 @@ class FrameAnalyser(
     private var counter: Int = 0,
     private var summation: Double = 0.0,
     private var accuracyScore: Double = 0.0,
-    private var maxScore: Double = 80.0,
-    private var frameCounter: Int = 0
+    var maxScore: Double = 30.0,
+    private var frameCounter: Int = 0,
+    var finalAverage: Double = 0.0
 
 ) : ImageAnalysis.Analyzer {
 
@@ -113,6 +115,7 @@ class FrameAnalyser(
             // Declare that the current frame is being processed.
             isProcessing.set(true)
 
+
             // Perform face detection
             val inputImage = InputImage.fromByteArray(
                 BitmaptoNv21(bitmap),
@@ -158,8 +161,6 @@ class FrameAnalyser(
                             accuracyScore = score.toDouble()
                             summation += accuracyScore
 
-                            Log.d("average score", "$summation")
-                            Log.d("accuracy score", "$accuracyScore")
 
                             Log.i(
                                 "Model", "Person identified as ${detectedFaceName} with " +
@@ -187,6 +188,14 @@ class FrameAnalyser(
                                     View.VISIBLE
                             }
 
+
+                            //after 10 frames compared trigger callback function
+                            if(frameCounter == 10){
+                                finalAverage = summation/frameCounter
+                                Handler(Looper.getMainLooper()).post {
+                                    callbackAfterComplete()
+                                }
+                            }
 
                         } catch (e: Exception) {
                             // If any exception occurs with this box and continue with the next boxes.
