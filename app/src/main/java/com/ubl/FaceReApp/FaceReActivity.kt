@@ -1,12 +1,16 @@
 package com.ubl.FaceReApp
 
 import android.Manifest
+import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.TextureView
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
@@ -72,8 +76,38 @@ class FaceReActivity : AppCompatActivity() {
         }
     }
 
+    private fun onAlertDialog(view: Context) {
+        //Instantiate builder variable
+        val builder = AlertDialog.Builder(view)
+
+        // set title
+        builder.setTitle("New Update found")
+
+        //set content area
+        builder.setMessage("Update your android 9.0 to 10.0")
+
+        //set negative button
+        builder.setPositiveButton(
+            "Update Now") { dialog, id ->
+            // User clicked Update Now button
+            Toast.makeText(view, "Updating your device", Toast.LENGTH_SHORT).show()
+        }
+
+        //set positive button
+        builder.setNegativeButton(
+            "Cancel") { dialog, id ->
+            // User cancelled the dialog
+        }
+
+        //set neutral button
+        builder.setNeutralButton("Reminder me latter") {dialog, id->
+            // User Click on reminder me latter
+        }
+        builder.show()
+    }
+
     fun SuccessCallbackFunction() {
-        Log.d("Bidhan", "My nameis bidhan")
+        onAlertDialog(this)
         return
     }
 

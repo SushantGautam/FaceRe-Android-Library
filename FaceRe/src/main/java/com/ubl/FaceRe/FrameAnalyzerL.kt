@@ -1,13 +1,16 @@
 package com.ubl.FaceRe
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.media.Image
 import android.os.Build
+import android.os.CountDownTimer
 import android.os.Environment
 import android.util.DisplayMetrics
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -28,7 +31,14 @@ import kotlin.reflect.KFunction0
 class FrameAnalyser(
     private var context: Context,
     private var boundingBoxOverlay: BoundingBoxOverlay,
-    private var facere: FaceRe?
+    private var facere: FaceRe?,
+
+    private var counter: Int = 0,
+    private var summation: Double = 0.0,
+    private var accuracyScore: Double = 0.0,
+    private var maxScore: Double = 80.0,
+    private var frameCounter: Int = 0
+
 ) : ImageAnalysis.Analyzer {
 
     private val useL2Norm = false
@@ -43,13 +53,33 @@ class FrameAnalyser(
     // Used to determine whether the incoming frame should be dropped or processed.
     private var isProcessing = AtomicBoolean(false)
 
-//    // FirebaseImageMeta for defining input image params.
-//    private var metadata = FirebaseVisionImageMetadata.Builder()
-//        .setWidth(640)
-//        .setHeight(480)
-// .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21 )
-//        .setRotation(degreesToFirebaseRotation(90))
-//        .build()
+    val callbackAfterComplete: KFunction0<Unit> = facere?.successCallback!!;
+
+    fun startTimeCounter(context: Context) {
+        object : CountDownTimer(10000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                counter++
+            }
+            override fun onFinish() {
+                var finalAverage = summation/frameCounter
+                if(finalAverage< maxScore){
+                    callbackAfterComplete()
+                    Toast.makeText(
+                        this@FrameAnalyser.context,
+                        "Average score is too low $finalAverage",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }else {
+                    Toast.makeText(
+                        this@FrameAnalyser.context,
+                        "Average score is Good $finalAverage",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }.start()
+    }
+
 
     // Store the face embeddings in a ( String , FloatArray ) ArrayList.
     // Where String -> name of the person abd FloatArray -> Embedding of the face.
@@ -72,10 +102,6 @@ class FrameAnalyser(
     // Here's where we receive our frames.
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun analyze(image: ImageProxy?, rotationDegrees: Int) {
-
-
-        val callbackAfterComplete: KFunction0<Unit>
-        callbackAfterComplete = facere?.successCallback!!;
 
         // android.media.Image -> android.graphics.Bitmap
         var bitmap = toBitmap(image?.image!!)
@@ -126,6 +152,14 @@ class FrameAnalyser(
                             else
                                 score = CosineSimilarityToAccuracy(scoreRaw)
                             val accuracy = String.format("%.2f", score) + " Or:" + scoreRaw
+
+                            frameCounter++
+                            accuracyScore = accuracy.toDouble()
+                            summation += accuracyScore
+
+                            Log.d("average score", "$summation")
+                            Log.d("accuracy score", "$accuracyScore")
+
                             Log.i(
                                 "Model", "Person identified as ${detectedFaceName} with " +
                                         "confidence of ${accuracy} %"
@@ -138,7 +172,6 @@ class FrameAnalyser(
                                     accuracy
                                 )
                             )
-                            callbackAfterComplete()
 
                         } catch (e: Exception) {
                             // If any exception occurs with this box and continue with the next boxes.
