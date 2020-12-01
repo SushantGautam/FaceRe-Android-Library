@@ -57,6 +57,8 @@ fun CosineSimilarityToAccuracy(cosScore: Float): Float {
     val maxTh = .90f
     val coss = cosScore - minTh
     val clampedL2 = (coss).coerceIn(0f, maxTh - minTh)
-    val percentage = (clampedL2) * 100 / (maxTh - minTh)
+    var percentage = (clampedL2) * 100 / (maxTh - minTh)
+    if (clampedL2 < minTh)
+        percentage = cosScore
     return percentage
 }
