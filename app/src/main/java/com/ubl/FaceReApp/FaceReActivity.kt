@@ -65,7 +65,7 @@ class FaceReActivity : AppCompatActivity() {
         boundingBoxOverlay.setWillNotDraw(false)
         boundingBoxOverlay.setZOrderOnTop(true)
 //        frameAnalyser = FrameAnalyser(this, boundingBoxOverlay)
-        faceRe.InitializeFrame(boundingBoxOverlay, this, ::SuccessCallbackFunction)
+        faceRe.InitializeFrame(boundingBoxOverlay, this, ::successCallbackFunction)
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
@@ -81,16 +81,17 @@ class FaceReActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(view)
 
         // set title
-        builder.setTitle("New Update found")
+        builder.setTitle("Alert Message")
 
         //set content area
-        builder.setMessage("Update your android 9.0 to 10.0")
+        builder.setMessage("Prediction accuracy is too low i.e. ${faceRe.frameAnalyser.finalAverage}")
 
         //set negative button
         builder.setPositiveButton(
-            "Update Now") { dialog, id ->
-            // User clicked Update Now button
-            Toast.makeText(view, "Updating your device", Toast.LENGTH_SHORT).show()
+            "Retry") { dialog, id ->
+            val intent = intent
+            finish()
+            startActivity(intent)
         }
 
         //set positive button
@@ -98,16 +99,34 @@ class FaceReActivity : AppCompatActivity() {
             "Cancel") { dialog, id ->
             // User cancelled the dialog
         }
-
-        //set neutral button
-        builder.setNeutralButton("Reminder me latter") {dialog, id->
-            // User Click on reminder me latter
-        }
+//        //set neutral button
+//        builder.setNeutralButton("Reminder me latter") {dialog, id->
+//            // User Click on reminder me latter
+//        }
         builder.show()
     }
 
-    fun SuccessCallbackFunction() {
-        onAlertDialog(this)
+    private fun successCallbackFunction() {
+        if(faceRe.frameAnalyser.finalAverage<faceRe.frameAnalyser.maxScore){
+            onAlertDialog(this)
+        }else {
+            //Instantiate builder variable
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Alert Message")
+            builder.setMessage("Prediction Accuracy is good i.e. ${faceRe.frameAnalyser.finalAverage}. Replace with user action")
+            builder.setNegativeButton(
+                "OK") { dialog, id ->
+
+            }
+            builder.show()
+
+//            Toast.makeText(
+//                this,
+//                "Prediction Accuracy is ${faceRe.frameAnalyser.finalAverage}." +
+//                        " Replace with user action",
+//                Toast.LENGTH_LONG
+//            ).show()
+        }
         return
     }
 

@@ -57,7 +57,7 @@ class FaceRe {
     ): FrameAnalyser {
         successCallback = callbackFunc
         frameAnalyser = FrameAnalyser(context, boundingBoxOverlay, this)
-        frameAnalyser.startTimeCounter(context)
+        //frameAnalyser.startTimeCounter()
         return frameAnalyser
     }
 
