@@ -82,37 +82,10 @@ class FaceReActivity : AppCompatActivity() {
             PackageManager.PERMISSION_GRANTED
         ) {
 
-//            faceRe.LoadImageUrlToCompare(
-////                URL("https://static.toiimg.com/photo/msid-71536423/71536423.jpg?374649"),
-//                URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
-//                "Sushant"
-//            )
-
-//            faceRe.LoadImageUrlToCompare(
-////                URL("https://static.toiimg.com/photo/msid-71536423/71536423.jpg?374649"),
-//                URL("https://o.remove.bg/uploads/ac88cbcf-bd11-4da2-8b91-b13ff5e384c2/image.png"),
-//                "Sushantback"
-//            )
-
-//            faceRe.LoadImageUrlToCompare(
-//                URL("https://static.toiimg.com/photo/msid-71536423/71536423.jpg?374649"),
-////                URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
-//                "Heroine"
-//            )
-//            faceRe.LoadImageUrlToCompare(
-//                URL("https://scontent.fktm4-1.fna.fbcdn.net/v/t1.0-9/67763407_2360690547356826_8110921931768725504_n.jpg?_nc_cat=108&ccb=2&_nc_sid=ad2b24&_nc_ohc=ZM8zUA2yl08AX8VfIGP&_nc_ht=scontent.fktm4-1.fna&oh=9cf82aaa55e4b2f4f949fb053da32a7f&oe=5FE9AAA6"),
-//                "Sushant Facebook"
-//            )
-
-//            faceRe.LoadImageUrlToCompare(
-//                URL("https://www.biography.com/.image/t_share/MTE4MDAzNDEwNzg5ODI4MTEw/barack-obama-12782369-1-402.jpg"),
-//                "Omaba"
-//            )
             faceRe.LoadImageUrlToCompare(
-                URL("https://o.remove.bg/uploads/94fc7e0a-b8a3-497e-8839-1f15c6d26e14/image.png"),
-                "Sushant Latest"
+                URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
+                "Sushant"
             )
-
 
             //load bitmap example
 //            faceRe.LoadBitmapToCompare(bmp: Bitmap, FaceName: "Sushant")
