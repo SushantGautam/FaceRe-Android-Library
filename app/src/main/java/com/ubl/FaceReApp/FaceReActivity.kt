@@ -7,11 +7,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.TextureView
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
@@ -45,6 +43,10 @@ class FaceReActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_re)
+
+        findViewById<TextView>(R.id.StudentName).text = "Student Name"
+
+        findViewById<TextView>(R.id.StudentID).text = "Student ID"
 
         faceRe.IntializeModel(this, rearCamera = false)
 
@@ -118,15 +120,16 @@ class FaceReActivity : AppCompatActivity() {
     }
 
     private fun successCallbackFunction() {
-        if(faceRe.frameAnalyser.finalAverage<faceRe.frameAnalyser.maxScore){
+        if (faceRe.frameAnalyser.finalAverage < faceRe.frameAnalyser.maxScore) {
             onAlertDialog(this)
-        }else {
+        } else {
             //Instantiate builder variable
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Alert Message")
             builder.setMessage("Prediction Accuracy is good i.e. ${faceRe.frameAnalyser.finalAverage}. Replace with user action")
             builder.setNegativeButton(
-                "OK") { dialog, id ->
+                "OK"
+            ) { dialog, id ->
 
             }
             builder.show()
