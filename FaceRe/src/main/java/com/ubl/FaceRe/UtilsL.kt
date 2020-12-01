@@ -53,12 +53,13 @@ fun NormToAccuracy(l2score: Float): Float {
 
 
 fun CosineSimilarityToAccuracy(cosScore: Float): Float {
-    val minTh = .50f
+    val minTh = .30f
     val maxTh = .90f
-    val coss = cosScore - minTh
-    val clampedL2 = (coss).coerceIn(0f, maxTh - minTh)
-    var percentage = (clampedL2) * 100 / (maxTh - minTh)
-    if (clampedL2 < minTh)
-        percentage = cosScore
-    return percentage
+
+    if (cosScore > maxTh) return cosScore * 100
+    else if (cosScore < minTh) return cosScore * 100
+
+    val clampedL2 = (cosScore).coerceIn(minTh, 1f)
+    val percentage = (clampedL2 - minTh) * 100 / (1 - minTh)
+    return percentage.coerceIn(minTh*100f, 100f)
 }
