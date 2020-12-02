@@ -1,13 +1,12 @@
-package com.ubl.FaceReApp
+package com.ubl.FaceRe
 
 import android.Manifest
+import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import android.view.TextureView
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
@@ -16,8 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.ubl.FaceRe.BoundingBoxOverlay
-import com.ubl.FaceRe.FaceRe
 import java.net.URL
 import java.util.concurrent.Executors
 
@@ -42,13 +39,22 @@ class FaceReActivity : AppCompatActivity() {
 //        }
 //    }
 
+
+    lateinit var StudentName: String
+    lateinit var StudentID: String
+    lateinit var StudentBitmap: String
+    lateinit var OldActivityjava: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_re)
 
-        findViewById<TextView>(R.id.StudentName).text = "Student Name"
+        StudentName = intent.getStringExtra("StudentName").toString()
+        StudentID = intent.getStringExtra("StudentID").toString()
+        StudentBitmap = intent.getStringExtra("StudentBitmap").toString()
 
-        findViewById<TextView>(R.id.StudentID).text = "Student ID"
+        findViewById<TextView>(R.id.StudentName).text = StudentName
+        findViewById<TextView>(R.id.StudentID).text = StudentName
 
         faceRe.IntializeModel(this, rearCamera = false)
 
@@ -142,10 +148,11 @@ class FaceReActivity : AppCompatActivity() {
         return
     }
 
-    private fun navigateToNewActivity(){
-        val i = Intent(this, NewActivity::class.java)
+    private fun navigateToNewActivity() {
+        val data = Intent()
+        data.putExtra("status", "success")
+        setResult(Activity.RESULT_OK, data)
         finish() //Kill the activity from which you will go to next activity
-        startActivity(i)
     }
 
     private fun LoadImageToCompare() {
@@ -157,9 +164,8 @@ class FaceReActivity : AppCompatActivity() {
                 URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
                 "Sushant"
             )
-
             //load bitmap example
-//            faceRe.LoadBitmapToCompare(bmp: Bitmap, FaceName: "Sushant")
+//            faceRe.LoadBitmapToCompare(StudentBitmap, StudentName)
 
         }
     }
@@ -176,7 +182,7 @@ class FaceReActivity : AppCompatActivity() {
             val parent = cameraTextureView.parent as ViewGroup
             parent.removeView(cameraTextureView)
             parent.addView(cameraTextureView, 0)
-            cameraTextureView.surfaceTexture = it.surfaceTexture
+            cameraTextureView.setSurfaceTexture(it.surfaceTexture)
             faceRe.updateTransform(cameraTextureView)
         }
 

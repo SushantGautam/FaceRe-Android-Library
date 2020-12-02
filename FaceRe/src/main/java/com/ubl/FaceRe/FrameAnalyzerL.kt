@@ -4,12 +4,14 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.media.Image
-import android.os.*
+import android.os.Build
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -182,13 +184,13 @@ class FrameAnalyser(
                             }
 
                             //after 10 frames compared trigger callback function
-                            if(frameCounter == 10){
-                                finalAverage = summation/frameCounter
+                            if (frameCounter == 10) {
+                                finalAverage = summation / frameCounter
                                 Handler(Looper.getMainLooper()).post {
                                     //pause AI process here
-                                    callbackAfterComplete()
 
-                                    if(finalAverage<maxScore){
+
+                                    if (finalAverage < maxScore) {
                                         //making these buttons only visible after 10 frames are compared
                                         (facere?.ActivityResources?.get("skip"))!!.visibility =
                                             View.VISIBLE
@@ -221,7 +223,6 @@ class FrameAnalyser(
                 }
         }
     }
-
 
 
     private fun saveBitmap(image: Bitmap, name: String) {

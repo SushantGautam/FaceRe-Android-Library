@@ -1,6 +1,9 @@
 package com.ubl.FaceRe
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
+import androidx.core.app.ActivityCompat.startActivityForResult
 
 fun bitmapToNV21(bitmap: Bitmap): ByteArray {
     val argb = IntArray(bitmap.width * bitmap.height)
@@ -61,5 +64,25 @@ fun CosineSimilarityToAccuracy(cosScore: Float): Float {
 
     val clampedL2 = (cosScore).coerceIn(minTh, 1f)
     val percentage = (clampedL2 - minTh) * 100 / (1 - minTh)
-    return percentage.coerceIn(minTh*100f, 100f)
+    return percentage.coerceIn(minTh * 100f, 100f)
+}
+
+
+interface CallBackFunction<T, U> {
+
+}
+
+
+fun StartFaceReActivity(
+    callerClass: Activity,
+    StudentName: String,
+    StudentID: String,
+    StudentBitmap: String
+) {
+    val intent = Intent(callerClass, FaceReActivity::class.java)
+    intent.putExtra("StudentName", StudentName)
+    intent.putExtra("StudentID", StudentID)
+    intent.putExtra("StudentBitmap", StudentBitmap)
+
+    startActivityForResult(callerClass, intent, 514, null)
 }
