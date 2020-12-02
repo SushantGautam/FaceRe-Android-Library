@@ -33,6 +33,10 @@
             android:name="com.ubl.FaceReApp.FaceReActivity"
             android:screenOrientation="landscape">
         </activity>
+        <activity
+            android:name="com.ubl.FaceReApp.NewActivity"
+            android:screenOrientation="landscape">
+        </activity>
     </application>
 
 </manifest>

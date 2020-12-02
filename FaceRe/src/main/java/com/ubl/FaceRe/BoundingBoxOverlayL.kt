@@ -12,7 +12,6 @@ import android.view.SurfaceView
 class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
     SurfaceView(context, attributeSet), SurfaceHolder.Callback {
 
-
     private val displayMetrics = context.resources.displayMetrics
 
     // Width and height of the device screen in pixels.

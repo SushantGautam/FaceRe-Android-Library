@@ -35,7 +35,7 @@ class FrameAnalyser(
     private var counter: Int = 0,
     private var summation: Double = 0.0,
     private var accuracyScore: Double = 0.0,
-    var maxScore: Double = 30.0,
+    var maxScore: Double = 80.0,
     private var frameCounter: Int = 0,
     var finalAverage: Double = 0.0
 
@@ -55,31 +55,31 @@ class FrameAnalyser(
 
     val callbackAfterComplete: KFunction0<Unit> = facere?.successCallback!!;
 
-    fun startTimeCounter(context: Context) {
-        object : CountDownTimer(10000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                counter++
-            }
-
-            override fun onFinish() {
-                var finalAverage = summation / frameCounter
-                if (finalAverage < maxScore) {
-                    callbackAfterComplete()
-                    Toast.makeText(
-                        this@FrameAnalyser.context,
-                        "Average score is too low $finalAverage",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        this@FrameAnalyser.context,
-                        "Average score is Good $finalAverage",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }.start()
-    }
+//    fun startTimeCounter(context: Context) {
+//        object : CountDownTimer(10000, 1000) {
+//            override fun onTick(millisUntilFinished: Long) {
+//                counter++
+//            }
+//
+//            override fun onFinish() {
+//                var finalAverage = summation / frameCounter
+//                if (finalAverage < maxScore) {
+//                    callbackAfterComplete()
+//                    Toast.makeText(
+//                        this@FrameAnalyser.context,
+//                        "Average score is too low $finalAverage",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+//                } else {
+//                    Toast.makeText(
+//                        this@FrameAnalyser.context,
+//                        "Average score is Good $finalAverage",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+//                }
+//            }
+//        }.start()
+//    }
 
 
     // Store the face embeddings in a ( String , FloatArray ) ArrayList.
@@ -175,24 +175,28 @@ class FrameAnalyser(
                             )
 
 
-
                             Handler(Looper.getMainLooper()).post {
                                 (facere?.ActivityResources?.get("accuracy") as TextView).text =
                                     String.format("%.2f", score) + "%"
 
-                                (facere?.ActivityResources?.get("skip"))!!.visibility =
-                                    View.VISIBLE
-
-                                (facere?.ActivityResources?.get("retry"))!!.visibility =
-                                    View.VISIBLE
                             }
-
 
                             //after 10 frames compared trigger callback function
                             if(frameCounter == 10){
                                 finalAverage = summation/frameCounter
                                 Handler(Looper.getMainLooper()).post {
+                                    //pause AI process here
                                     callbackAfterComplete()
+
+                                    if(finalAverage<maxScore){
+                                        //making these buttons only visible after 10 frames are compared
+                                        (facere?.ActivityResources?.get("skip"))!!.visibility =
+                                            View.VISIBLE
+
+                                        (facere?.ActivityResources?.get("retry"))!!.visibility =
+                                            View.VISIBLE
+                                    }
+
                                 }
                             }
 
@@ -217,6 +221,7 @@ class FrameAnalyser(
                 }
         }
     }
+
 
 
     private fun saveBitmap(image: Bitmap, name: String) {

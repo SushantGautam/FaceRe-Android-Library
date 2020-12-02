@@ -1,15 +1,17 @@
 package com.ubl.FaceReApp
 
 import android.Manifest
-import android.app.AlertDialog
 import android.app.ProgressDialog
-import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.view.TextureView
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
@@ -75,6 +77,15 @@ class FaceReActivity : AppCompatActivity() {
             "skip" to findViewById(R.id.skip) as Button
         )
 
+        resources["retry"]?.setOnClickListener {
+            finish()
+            startActivity(intent)
+        }
+
+        resources["skip"]?.setOnClickListener {
+            navigateToNewActivity()
+        }
+
 
         faceRe.InitializeFrame(boundingBoxOverlay, this, ::successCallbackFunction, resources)
 
@@ -87,61 +98,54 @@ class FaceReActivity : AppCompatActivity() {
         }
     }
 
-    private fun onAlertDialog(view: Context) {
-        //Instantiate builder variable
-        val builder = AlertDialog.Builder(view)
-
-        // set title
-        builder.setTitle("Alert Message")
-
-        //set content area
-        builder.setMessage("Prediction accuracy is too low i.e. ${faceRe.frameAnalyser.finalAverage}")
-
-        //set negative button
-        builder.setPositiveButton(
-            "Retry"
-        ) { dialog, id ->
-            val intent = intent
-            finish()
-            startActivity(intent)
-        }
-
-        //set positive button
-        builder.setNegativeButton(
-            "Cancel"
-        ) { dialog, id ->
-            // User cancelled the dialog
-        }
-//        //set neutral button
-//        builder.setNeutralButton("Reminder me latter") { dialog, id ->
-//            // User Click on reminder me latter
+//    private fun onAlertDialog(view: Context) {
+//        //Instantiate builder variable
+//        val builder = AlertDialog.Builder(view)
+//
+//        // set title
+//        builder.setTitle("Alert Message")
+//
+//        //set content area
+//        builder.setMessage("Prediction accuracy is too low i.e. ${faceRe.frameAnalyser.finalAverage}")
+//
+//        //set negative button
+//        builder.setPositiveButton(
+//            "Retry"
+//        ) { dialog, id ->
+//            val intent = intent
+//            finish()
+//            startActivity(intent)
 //        }
-        builder.show()
-    }
+//
+//        //set positive button
+//        builder.setNegativeButton(
+//            "Cancel"
+//        ) { dialog, id ->
+//            // User cancelled the dialog
+//        }
+////        //set neutral button
+////        builder.setNeutralButton("Reminder me latter") { dialog, id ->
+////            // User Click on reminder me latter
+////        }
+//        builder.show()
+//    }
 
     private fun successCallbackFunction() {
         if (faceRe.frameAnalyser.finalAverage < faceRe.frameAnalyser.maxScore) {
-            onAlertDialog(this)
+//            onAlertDialog(this)
+            CameraX.unbindAll()
         } else {
-            //Instantiate builder variable
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Alert Message")
-            builder.setMessage("Prediction Accuracy is good i.e. ${faceRe.frameAnalyser.finalAverage}. Replace with user action")
-            builder.setNegativeButton(
-                "OK"
-            ) { dialog, id ->
-
-            }
-            builder.show()
-
-//            Toast.makeText(
-//                this,
-//                "Prediction Accuracy is ${faceRe.frameAnalyser.finalAverage}." +
-//                        " Replace with user action",
-//                Toast.LENGTH_LONG
-//            ).show()
+            val toastMessage = Toast.makeText(this, "Success", Toast.LENGTH_LONG)
+            toastMessage.show()
+            navigateToNewActivity()
         }
         return
+    }
+
+    private fun navigateToNewActivity(){
+        val i = Intent(this, NewActivity::class.java)
+        finish() //Kill the activity from which you will go to next activity
+        startActivity(i)
     }
 
     private fun LoadImageToCompare() {
@@ -163,6 +167,7 @@ class FaceReActivity : AppCompatActivity() {
 
     // Start the camera preview once the permissions are granted.
     private fun startCamera() {
+
         val previewConfig = PreviewConfig.Builder().apply {
             setLensFacing(CameraX.LensFacing.FRONT)
         }.build()
