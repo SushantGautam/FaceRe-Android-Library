@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ubl.FaceRe.StartFaceReActivity
 
@@ -33,8 +32,8 @@ class MainActivity : AppCompatActivity() {
             val bundle: Bundle? = data?.getExtras()
             val status = bundle?.getString("status")
             if (status == "success") {
-                Toast.makeText(this, "Success", Toast.LENGTH_LONG).show()
-            }
+                successCallbackFunction()
+            } else errorCallbackFunction()
         }
     }
 
