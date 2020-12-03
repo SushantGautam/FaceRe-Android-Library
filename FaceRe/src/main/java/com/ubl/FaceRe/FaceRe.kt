@@ -21,9 +21,6 @@ import kotlin.reflect.KFunction0
 
 class FaceRe {
 
-//    fun init(application: Application?) {
-//    }
-
     private var imageData = ArrayList<Pair<String, FloatArray>>()
 
     // Use Firebase MLKit to crop faces from images present in "/images" folder.
@@ -34,7 +31,7 @@ class FaceRe {
 
 
     lateinit var frameAnalyser: FrameAnalyser
-    var RearCamera = false
+    var rearCamera = false
 
     var imageLabelPairs = ArrayList<Pair<Bitmap, String>>()
 
@@ -44,16 +41,16 @@ class FaceRe {
         .build()
     private val detector = FaceDetection.getClient(accurateOps)
 
-    fun IntializeModel(context: Context, rearCamera: Boolean = false): FaceNetModel? {
+    fun initializeModel(context: Context, rearCamera: Boolean = false): FaceNetModel? {
         model = FaceNetModel(context)
-        RearCamera = rearCamera
+        this.rearCamera = rearCamera
         return model
     }
 
     lateinit var successCallback: KFunction0<Unit>
-    lateinit var ActivityResources: Map<String, View>
+    lateinit var activityResources: Map<String, View>
 
-    fun InitializeFrame(
+    fun initializeFrame(
         boundingBoxOverlay: BoundingBoxOverlay,
         context: Context,
         callbackFunc: KFunction0<Unit>,
@@ -61,13 +58,11 @@ class FaceRe {
     ): FrameAnalyser {
         successCallback = callbackFunc
         frameAnalyser = FrameAnalyser(context, boundingBoxOverlay, this)
-        //frameAnalyser.startTimeCounter()
-        ActivityResources = resources
+        activityResources = resources
         return frameAnalyser
     }
 
-    fun LoadBitmapToCompare(bmp: Bitmap, FaceName: String) {
-
+    fun loadBitmapToCompare(bmp: Bitmap, FaceName: String) {
         try {
             imageLabelPairs.add(
                 Pair(bmp, FaceName)
@@ -77,11 +72,11 @@ class FaceRe {
         }
     }
 
-    fun LoadImageUrlToCompare(ulrn: URL, FaceName: String) {
+    fun loadImageUrlToCompare(ulrn: URL, FaceName: String) {
         val s = Thread {
             try {
                 val con = ulrn.openConnection() as HttpURLConnection
-                val iss: InputStream = con.getInputStream()
+                val iss: InputStream = con.inputStream
                 val bmp = BitmapFactory.decodeStream(iss)
                 if (null != bmp) {
                     imageLabelPairs.add(
@@ -98,12 +93,10 @@ class FaceRe {
             }
         }
         s.start()
-
     }
 
     private fun scanImage(counter: Int) {
         val sample = imageLabelPairs[counter]
-
         val inputImage = InputImage.fromByteArray(
             bitmapToNV21(sample.first),
             sample.first.width,
@@ -125,15 +118,8 @@ class FaceRe {
                 )
             }
             if (counter + 1 == imageLabelPairs.size) {
-//                Toast.makeText(
-//                    this@MainActivity,
-//                    "Processing completed. ${imageData.size}",
-//                    Toast.LENGTH_LONG
-//                ).show()
-//                progressDialog?.dismiss()
                 frameAnalyser.faceList = imageData
             } else {
-//                progressDialog?.setMessage("Processed ${counter + 1} images")
                 scanImage(counter + 1)
             }
         }

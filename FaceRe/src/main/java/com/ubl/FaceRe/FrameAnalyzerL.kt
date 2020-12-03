@@ -20,7 +20,6 @@ import com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_NV21
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.pow
@@ -34,10 +33,9 @@ class FrameAnalyser(
     private var boundingBoxOverlay: BoundingBoxOverlay,
     private var facere: FaceRe?,
 
-    private var counter: Int = 0,
     private var summation: Double = 0.0,
     private var accuracyScore: Double = 0.0,
-    var maxScore: Double = 80.0,
+    var maxScore: Double = 40.0,
     private var frameCounter: Int = 0,
     var finalAverage: Double = 0.0
 
@@ -50,39 +48,12 @@ class FrameAnalyser(
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         .build()
 
-    val faceDetector = FaceDetection.getClient(realTimeOpts)
+    private val faceDetector = FaceDetection.getClient(realTimeOpts)
 
     // Used to determine whether the incoming frame should be dropped or processed.
     private var isProcessing = AtomicBoolean(false)
 
     val callbackAfterComplete: KFunction0<Unit> = facere?.successCallback!!;
-
-//    fun startTimeCounter(context: Context) {
-//        object : CountDownTimer(10000, 1000) {
-//            override fun onTick(millisUntilFinished: Long) {
-//                counter++
-//            }
-//
-//            override fun onFinish() {
-//                var finalAverage = summation / frameCounter
-//                if (finalAverage < maxScore) {
-//                    callbackAfterComplete()
-//                    Toast.makeText(
-//                        this@FrameAnalyser.context,
-//                        "Average score is too low $finalAverage",
-//                        Toast.LENGTH_LONG
-//                    ).show()
-//                } else {
-//                    Toast.makeText(
-//                        this@FrameAnalyser.context,
-//                        "Average score is Good $finalAverage",
-//                        Toast.LENGTH_LONG
-//                    ).show()
-//                }
-//            }
-//        }.start()
-//    }
-
 
     // Store the face embeddings in a ( String , FloatArray ) ArrayList.
     // Where String -> name of the person abd FloatArray -> Embedding of the face.
@@ -92,15 +63,15 @@ class FrameAnalyser(
     private val model = FaceNetModel(context)
 
 
-    fun flip(d: Bitmap): BitmapDrawable {
+    private fun flip(d: Bitmap): BitmapDrawable {
         val m = Matrix()
         m.preScale((-1).toFloat(), 1F)
-        val src = d
-        val dst = Bitmap.createBitmap(src, 0, 0, src.width, src.height, m, false)
+        val dst = Bitmap.createBitmap(d, 0, 0, d.width, d.height, m, false)
         dst.density = DisplayMetrics.DENSITY_DEFAULT
         return BitmapDrawable(dst)
     }
 
+    var fileName: String? = "myFaceReImage" //no .png or .jpg needed
 
     // Here's where we receive our frames.
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -115,7 +86,6 @@ class FrameAnalyser(
         } else {
             // Declare that the current frame is being processed.
             isProcessing.set(true)
-
 
             // Perform face detection
             val inputImage = InputImage.fromByteArray(
@@ -158,6 +128,7 @@ class FrameAnalyser(
                             val accuracyToShowInBBox =
                                 String.format("%.2f", score) + " Or:" + scoreRaw
 
+                            //tracking number of frames analyzed and accuracy
                             frameCounter++
                             accuracyScore = score.toDouble()
                             summation += accuracyScore
@@ -168,7 +139,7 @@ class FrameAnalyser(
                                         "confidence of ${accuracyToShowInBBox} %"
                             )
                             // Push the results in form of a Prediction.
-                            val add = predictions.add(
+                            predictions.add(
                                 Prediction(
                                     face.boundingBox,
                                     detectedFaceName,
@@ -176,9 +147,8 @@ class FrameAnalyser(
                                 )
                             )
 
-
                             Handler(Looper.getMainLooper()).post {
-                                (facere?.ActivityResources?.get("accuracy") as TextView).text =
+                                (facere?.activityResources?.get("accuracy") as TextView).text =
                                     String.format("%.2f", score) + "%"
 
                             }
@@ -188,14 +158,29 @@ class FrameAnalyser(
                                 finalAverage = summation / frameCounter
                                 Handler(Looper.getMainLooper()).post {
                                     //pause AI process here
+                                    callbackAfterComplete()
+
+                                    //save the last frame locally in private to access in the user app
+                                    try {
+                                        val bytes = ByteArrayOutputStream()
+                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+                                        val fo: FileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)
+                                        fo.write(bytes.toByteArray())
+                                        // remember close file output
+                                        fo.close()
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        fileName = null
+                                    }
 
 
+                                    //show the retry and skip button overly
                                     if (finalAverage < maxScore) {
                                         //making these buttons only visible after 10 frames are compared
-                                        (facere?.ActivityResources?.get("skip"))!!.visibility =
+                                        (facere?.activityResources?.get("skip"))!!.visibility =
                                             View.VISIBLE
 
-                                        (facere?.ActivityResources?.get("retry"))!!.visibility =
+                                        (facere?.activityResources?.get("retry"))!!.visibility =
                                             View.VISIBLE
                                     }
 
@@ -225,11 +210,11 @@ class FrameAnalyser(
     }
 
 
-    private fun saveBitmap(image: Bitmap, name: String) {
-        val fileOutputStream =
-            FileOutputStream(File(Environment.getExternalStorageDirectory()!!.absolutePath + "/$name.png"))
-        image.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-    }
+//    private fun saveBitmap(image: Bitmap, name: String) {
+//        val fileOutputStream =
+//            FileOutputStream(File(Environment.getExternalStorageDirectory()!!.absolutePath + "/$name.png"))
+//        image.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+//    }
 
     // Compute the L2 norm of ( x2 - x1 )
     private fun L2Norm(x1: FloatArray, x2: FloatArray): Float {

@@ -44,15 +44,6 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
         color = Color.WHITE
     }
 
-//    override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-//    }
-//
-//    override fun surfaceDestroyed(holder: SurfaceHolder?) {
-//    }
-//
-//    override fun surfaceCreated(holder: SurfaceHolder?) {
-//    }
-
     override fun onDraw(canvas: Canvas?) {
         if (faceBoundingBoxes != null) {
             for (face in faceBoundingBoxes!!) {

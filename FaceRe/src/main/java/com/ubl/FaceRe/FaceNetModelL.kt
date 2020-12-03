@@ -32,7 +32,6 @@ class FaceNetModel(context: Context) {
 
 
     // Gets an face embedding using FaceNet
-    // Gets an face embedding using FaceNet
     fun getFaceEmbedding(image: Bitmap, crop: Rect, preRotate: Boolean): FloatArray {
         val s = runFaceNet(
             convertBitmapToBuffer(
@@ -50,8 +49,6 @@ class FaceNetModel(context: Context) {
         )
 
         return s[0]
-
-
     }
 
     // Run the FaceNet model.

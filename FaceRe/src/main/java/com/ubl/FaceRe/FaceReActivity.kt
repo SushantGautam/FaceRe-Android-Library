@@ -2,7 +2,6 @@ package com.ubl.FaceRe
 
 import android.Manifest
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -21,47 +20,32 @@ import java.util.concurrent.Executors
 
 class FaceReActivity : AppCompatActivity() {
 
-    var faceRe = FaceRe()
+    private var faceRe = FaceRe()
     private val REQUEST_CODE_PERMISSIONS = 10
     private val REQUIRED_PERMISSIONS =
         arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private lateinit var cameraTextureView: TextureView
 
-    private var progressDialog: ProgressDialog? = null
-
-
-//    // For testing purposes only!
-//    companion object {
-//        // This view's VISIBILITY is set to View.GONE in activity_main.xml
-//        lateinit var logTextView: TextView
-//        fun setMessage(message: String) {
-//            logTextView.text = message
-//        }
-//    }
-
-
-    lateinit var StudentName: String
-    lateinit var StudentID: String
-    lateinit var StudentBitmap: String
-    lateinit var OldActivityjava: String
+    private lateinit var studentName: String
+    private lateinit var studentID: String
+    private lateinit var studentBitmap: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_re)
 
-        StudentName = intent.getStringExtra("StudentName").toString()
-        StudentID = intent.getStringExtra("StudentID").toString()
-        StudentBitmap = intent.getStringExtra("StudentBitmap").toString()
+        studentName = intent.getStringExtra("StudentName").toString()
+        studentID = intent.getStringExtra("StudentID").toString()
+        studentBitmap = intent.getStringExtra("StudentBitmap").toString()
 
-        findViewById<TextView>(R.id.StudentName).text = StudentName
-        findViewById<TextView>(R.id.StudentID).text = StudentName
+        findViewById<TextView>(R.id.StudentName).text = studentName
+        findViewById<TextView>(R.id.StudentID).text = studentName
 
-        faceRe.IntializeModel(this, rearCamera = false)
+        faceRe.initializeModel(this, rearCamera = false)
 
         // Implementation of CameraX preview
         cameraTextureView = findViewById(R.id.camera_textureView)
         val boundingBoxOverlay = findViewById<BoundingBoxOverlay>(R.id.bbox_overlay)
-//        logTextView = findViewById(R.id.logTextView)
 
         if (allPermissionsGranted()) {
             cameraTextureView.post { startCamera() }
@@ -75,7 +59,6 @@ class FaceReActivity : AppCompatActivity() {
         // Necessary to keep the Overlay above the TextureView so that the boxes are visible.
         boundingBoxOverlay.setWillNotDraw(false)
         boundingBoxOverlay.setZOrderOnTop(true)
-//        frameAnalyser = FrameAnalyser(this, boundingBoxOverlay)
 
         val resources = mapOf(
             "accuracy" to findViewById(R.id.latestaccuracy) as TextView,
@@ -92,53 +75,20 @@ class FaceReActivity : AppCompatActivity() {
             navigateToNewActivity()
         }
 
-
-        faceRe.InitializeFrame(boundingBoxOverlay, this, ::successCallbackFunction, resources)
+        faceRe.initializeFrame(boundingBoxOverlay, this, ::successCallbackFunction, resources)
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
             PackageManager.PERMISSION_GRANTED
         ) {
             // Read image data
-            LoadImageToCompare()
+            loadImageToCompare()
         }
     }
 
-//    private fun onAlertDialog(view: Context) {
-//        //Instantiate builder variable
-//        val builder = AlertDialog.Builder(view)
-//
-//        // set title
-//        builder.setTitle("Alert Message")
-//
-//        //set content area
-//        builder.setMessage("Prediction accuracy is too low i.e. ${faceRe.frameAnalyser.finalAverage}")
-//
-//        //set negative button
-//        builder.setPositiveButton(
-//            "Retry"
-//        ) { dialog, id ->
-//            val intent = intent
-//            finish()
-//            startActivity(intent)
-//        }
-//
-//        //set positive button
-//        builder.setNegativeButton(
-//            "Cancel"
-//        ) { dialog, id ->
-//            // User cancelled the dialog
-//        }
-////        //set neutral button
-////        builder.setNeutralButton("Reminder me latter") { dialog, id ->
-////            // User Click on reminder me latter
-////        }
-//        builder.show()
-//    }
 
     private fun successCallbackFunction() {
         if (faceRe.frameAnalyser.finalAverage < faceRe.frameAnalyser.maxScore) {
-//            onAlertDialog(this)
             CameraX.unbindAll()
         } else {
             val toastMessage = Toast.makeText(this, "Success", Toast.LENGTH_LONG)
@@ -155,28 +105,23 @@ class FaceReActivity : AppCompatActivity() {
         finish() //Kill the activity from which you will go to next activity
     }
 
-    private fun LoadImageToCompare() {
+    private fun loadImageToCompare() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
             PackageManager.PERMISSION_GRANTED
         ) {
-
-            faceRe.LoadImageUrlToCompare(
+            faceRe.loadImageUrlToCompare(
                 URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
                 "Sushant"
             )
-            //load bitmap example
-//            faceRe.LoadBitmapToCompare(StudentBitmap, StudentName)
-
         }
     }
 
-
     // Start the camera preview once the permissions are granted.
     private fun startCamera() {
-
         val previewConfig = PreviewConfig.Builder().apply {
             setLensFacing(CameraX.LensFacing.FRONT)
         }.build()
+
         val preview = Preview(previewConfig)
         preview.setOnPreviewOutputUpdateListener {
             val parent = cameraTextureView.parent as ViewGroup
@@ -185,7 +130,6 @@ class FaceReActivity : AppCompatActivity() {
             cameraTextureView.setSurfaceTexture(it.surfaceTexture)
             faceRe.updateTransform(cameraTextureView)
         }
-
         // FrameAnalyser -> fetches camera frames and makes them in the analyse() method.
         val analyzerConfig = ImageAnalysisConfig.Builder().apply {
             setImageReaderMode(
@@ -211,7 +155,7 @@ class FaceReActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 cameraTextureView.post { startCamera() }
-                LoadImageToCompare()
+                loadImageToCompare()
             }
         }
     }
@@ -219,6 +163,5 @@ class FaceReActivity : AppCompatActivity() {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
-
 
 }

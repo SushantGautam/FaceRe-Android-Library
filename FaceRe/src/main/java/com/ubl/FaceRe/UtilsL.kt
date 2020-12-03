@@ -67,13 +67,7 @@ fun CosineSimilarityToAccuracy(cosScore: Float): Float {
     return percentage.coerceIn(minTh * 100f, 100f)
 }
 
-
-interface CallBackFunction<T, U> {
-
-}
-
-
-fun StartFaceReActivity(
+fun startFaceReActivity(
     callerClass: Activity,
     StudentName: String,
     StudentID: String,
