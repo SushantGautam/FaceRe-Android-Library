@@ -5,7 +5,6 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.media.Image
 import android.os.Build
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
@@ -35,7 +34,7 @@ class FrameAnalyser(
 
     private var summation: Double = 0.0,
     private var accuracyScore: Double = 0.0,
-    var maxScore: Double = 40.0,
+    var maxScore: Double = 80.0,
     private var frameCounter: Int = 0,
     var finalAverage: Double = 0.0
 
@@ -70,8 +69,6 @@ class FrameAnalyser(
         dst.density = DisplayMetrics.DENSITY_DEFAULT
         return BitmapDrawable(dst)
     }
-
-    var fileName: String? = "myFaceReImage" //no .png or .jpg needed
 
     // Here's where we receive our frames.
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -161,6 +158,7 @@ class FrameAnalyser(
                                     callbackAfterComplete()
 
                                     //save the last frame locally in private to access in the user app
+                                    var fileName: String? = "myFaceReImage" //no .png or .jpg needed
                                     try {
                                         val bytes = ByteArrayOutputStream()
                                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)

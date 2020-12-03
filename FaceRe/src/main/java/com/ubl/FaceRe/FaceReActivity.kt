@@ -1,9 +1,12 @@
 package com.ubl.FaceRe
 
 import android.Manifest
+import android.R.attr.src
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.TextureView
 import android.view.ViewGroup
@@ -14,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.io.FileNotFoundException
 import java.net.URL
 import java.util.concurrent.Executors
 
@@ -28,7 +32,8 @@ class FaceReActivity : AppCompatActivity() {
 
     private lateinit var studentName: String
     private lateinit var studentID: String
-    private lateinit var studentBitmap: String
+    private lateinit var studentBitmapFileName: String
+    private lateinit var studentBitmap: Bitmap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,10 +41,17 @@ class FaceReActivity : AppCompatActivity() {
 
         studentName = intent.getStringExtra("StudentName").toString()
         studentID = intent.getStringExtra("StudentID").toString()
-        studentBitmap = intent.getStringExtra("StudentBitmap").toString()
+        studentBitmapFileName = intent.getStringExtra("StudentBitmapFileName").toString()
+
+        //retrieving student image bitmap for comparing with camera frames (images)
+        try {
+            studentBitmap = BitmapFactory.decodeStream(openFileInput(studentBitmapFileName))
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
 
         findViewById<TextView>(R.id.StudentName).text = studentName
-        findViewById<TextView>(R.id.StudentID).text = studentName
+        findViewById<TextView>(R.id.StudentID).text = studentID
 
         faceRe.initializeModel(this, rearCamera = false)
 
@@ -109,9 +121,14 @@ class FaceReActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
             PackageManager.PERMISSION_GRANTED
         ) {
-            faceRe.loadImageUrlToCompare(
-                URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
-                "Sushant"
+           // Log.d("USER INPUT BIMAP", studentBitmap.toString())
+//            faceRe.loadImageUrlToCompare(
+//                URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
+//                "Sushant"
+//            )
+            faceRe.loadBitmapToCompare(
+                studentBitmap,
+                "Bidhan"
             )
         }
     }

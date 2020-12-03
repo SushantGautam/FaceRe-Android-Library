@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.ubl.FaceRe.FaceRe
-import com.ubl.FaceRe.FrameAnalyser
+import com.ubl.FaceRe.saveBitmap
 import com.ubl.FaceRe.startFaceReActivity
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,14 +20,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         button = findViewById(R.id.button)
         button.setOnClickListener {
+
+            val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.bidhan)
+
             startFaceReActivity(
                 callerClass = this,
                 StudentName = "Student Name",
                 StudentID = "Student ID",
-                StudentBitmap = "String Change to Bitmap"
+                StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!
             )
         }
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

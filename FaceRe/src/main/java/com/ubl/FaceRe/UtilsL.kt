@@ -1,9 +1,12 @@
 package com.ubl.FaceRe
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import androidx.core.app.ActivityCompat.startActivityForResult
+import java.io.ByteArrayOutputStream
+
 
 fun bitmapToNV21(bitmap: Bitmap): ByteArray {
     val argb = IntArray(bitmap.width * bitmap.height)
@@ -67,16 +70,36 @@ fun CosineSimilarityToAccuracy(cosScore: Float): Float {
     return percentage.coerceIn(minTh * 100f, 100f)
 }
 
+fun saveBitmap(bitmap: Bitmap, applicationContext: Context): String? {
+    var fileName: String? = "ImageName" //no .png or .jpg needed
+    try {
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val fo = applicationContext.openFileOutput(fileName, Context.MODE_PRIVATE)
+        fo.write(bytes.toByteArray())
+        // remember close file output
+        fo.close()
+    } catch (e: java.lang.Exception) {
+        e.printStackTrace()
+        fileName = null
+    }
+    return fileName
+}
+
 fun startFaceReActivity(
     callerClass: Activity,
     StudentName: String,
     StudentID: String,
-    StudentBitmap: String
+    StudentBitmapFileName: String
 ) {
     val intent = Intent(callerClass, FaceReActivity::class.java)
     intent.putExtra("StudentName", StudentName)
     intent.putExtra("StudentID", StudentID)
-    intent.putExtra("StudentBitmap", StudentBitmap)
+
+//    val stream = ByteArrayOutputStream()
+//    StudentBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+//    val bytes: ByteArray = stream.toByteArray()
+    intent.putExtra("StudentBitmapFileName", StudentBitmapFileName )
 
     startActivityForResult(callerClass, intent, 514, null)
 }
