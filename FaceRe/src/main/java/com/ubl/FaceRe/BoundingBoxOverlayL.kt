@@ -11,7 +11,7 @@ import androidx.camera.core.CameraX
 
 // Defines an overlay on which the boxes and text will be drawn.
 class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
-        SurfaceView(context, attributeSet), SurfaceHolder.Callback {
+    SurfaceView(context, attributeSet), SurfaceHolder.Callback {
 
     private val displayMetrics = context.resources.displayMetrics
 
@@ -64,10 +64,11 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
                 // Draw boxes and text
                 canvas?.drawRoundRect(processedBbox, 16f, 16f, boxPaint)
                 canvas?.drawText(
-                        face.label + ": " + (face.minDistance).toString(),
-                        processedBbox.centerX(),
-                        processedBbox.centerY(),
-                        textPaint
+//                        face.label + ": " + (face.minDistance).toString(),
+                    "+",
+                    processedBbox.centerX(),
+                    processedBbox.centerY(),
+                    textPaint
                 )
                 Log.e("Info", "Rect received ${processedBbox.toShortString()}")
             }
