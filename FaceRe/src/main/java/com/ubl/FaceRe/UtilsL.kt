@@ -87,10 +87,11 @@ fun saveBitmap(bitmap: Bitmap, applicationContext: Context): String? {
 }
 
 fun startFaceReActivity(
-    callerClass: Activity,
-    StudentName: String,
-    StudentID: String,
-    StudentBitmapFileName: String
+        callerClass: Activity,
+        StudentName: String,
+        StudentID: String,
+        StudentBitmapFileName: String,
+        camera: String = "back"
 ) {
     val intent = Intent(callerClass, FaceReActivity::class.java)
     intent.putExtra("StudentName", StudentName)
@@ -100,6 +101,7 @@ fun startFaceReActivity(
 //    StudentBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
 //    val bytes: ByteArray = stream.toByteArray()
     intent.putExtra("StudentBitmapFileName", StudentBitmapFileName )
+    intent.putExtra("cameraBackorFront", camera )
 
     startActivityForResult(callerClass, intent, 514, null)
 }

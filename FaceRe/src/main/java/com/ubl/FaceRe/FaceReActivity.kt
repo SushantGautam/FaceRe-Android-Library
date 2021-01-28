@@ -27,13 +27,14 @@ class FaceReActivity : AppCompatActivity() {
     private var faceRe = FaceRe()
     private val REQUEST_CODE_PERMISSIONS = 10
     private val REQUIRED_PERMISSIONS =
-        arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private lateinit var cameraTextureView: TextureView
 
     private lateinit var studentName: String
     private lateinit var studentID: String
     private lateinit var studentBitmapFileName: String
     private lateinit var studentBitmap: Bitmap
+    private lateinit var cameraBackorFront: CameraX.LensFacing
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,13 @@ class FaceReActivity : AppCompatActivity() {
         studentName = intent.getStringExtra("StudentName").toString()
         studentID = intent.getStringExtra("StudentID").toString()
         studentBitmapFileName = intent.getStringExtra("StudentBitmapFileName").toString()
+
+        // choose camera
+        val cameraBackorFront_tmp = intent.getStringExtra("cameraBackorFront").toString()
+        if (cameraBackorFront_tmp == "front" || cameraBackorFront_tmp == "Front") {
+            cameraBackorFront = CameraX.LensFacing.FRONT
+        } else cameraBackorFront = CameraX.LensFacing.BACK
+
 
         //retrieving student image bitmap for comparing with camera frames (images)
         try {
@@ -72,10 +80,12 @@ class FaceReActivity : AppCompatActivity() {
         boundingBoxOverlay.setWillNotDraw(false)
         boundingBoxOverlay.setZOrderOnTop(true)
 
+        boundingBoxOverlay.cameraBackorFront = cameraBackorFront
+
         val resources = mapOf(
-            "accuracy" to findViewById(R.id.latestaccuracy) as TextView,
-            "retry" to findViewById(R.id.retry) as Button,
-            "skip" to findViewById(R.id.skip) as Button
+                "accuracy" to findViewById(R.id.latestaccuracy) as TextView,
+                "retry" to findViewById(R.id.retry) as Button,
+                "skip" to findViewById(R.id.skip) as Button
         )
 
         resources["retry"]?.setOnClickListener {
@@ -91,7 +101,7 @@ class FaceReActivity : AppCompatActivity() {
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-            PackageManager.PERMISSION_GRANTED
+                PackageManager.PERMISSION_GRANTED
         ) {
             // Read image data
             loadImageToCompare()
@@ -113,22 +123,24 @@ class FaceReActivity : AppCompatActivity() {
     private fun navigateToNewActivity() {
         val data = Intent()
         data.putExtra("status", "success")
+        data.putExtra("score", faceRe.frameAnalyser.finalAverage)
+        data.putExtra("maxScore", faceRe.frameAnalyser.maxScore)
         setResult(Activity.RESULT_OK, data)
         finish() //Kill the activity from which you will go to next activity
     }
 
     private fun loadImageToCompare() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-            PackageManager.PERMISSION_GRANTED
+                PackageManager.PERMISSION_GRANTED
         ) {
-           // Log.d("USER INPUT BIMAP", studentBitmap.toString())
+            // Log.d("USER INPUT BIMAP", studentBitmap.toString())
 //            faceRe.loadImageUrlToCompare(
 //                URL("https://4.bp.blogspot.com/-HBz-6BgylPc/WJArnxlNSZI/AAAAAAAAAZw/IHM5Ug2KmLcCmyKd9BsGo7f-p0kIc_M5gCLcB/s1600/Hd%2BBlur%2BEditor2016_11_06_22_17_35.jpg"),
 //                "Sushant"
 //            )
             faceRe.loadBitmapToCompare(
-                studentBitmap,
-                "Bidhan"
+                    studentBitmap,
+                    "Bidhan"
             )
         }
     }
@@ -136,7 +148,7 @@ class FaceReActivity : AppCompatActivity() {
     // Start the camera preview once the permissions are granted.
     private fun startCamera() {
         val previewConfig = PreviewConfig.Builder().apply {
-            setLensFacing(CameraX.LensFacing.BACK)
+            setLensFacing(cameraBackorFront)
         }.build()
 
         val preview = Preview(previewConfig)
@@ -150,9 +162,9 @@ class FaceReActivity : AppCompatActivity() {
         // FrameAnalyser -> fetches camera frames and makes them in the analyse() method.
         val analyzerConfig = ImageAnalysisConfig.Builder().apply {
             setImageReaderMode(
-                ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE
+                    ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE
             )
-            setLensFacing(CameraX.LensFacing.BACK)
+            setLensFacing(cameraBackorFront)
         }.build()
 
         val analyzerUseCase = ImageAnalysis(analyzerConfig).apply {
@@ -165,9 +177,9 @@ class FaceReActivity : AppCompatActivity() {
 
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<String>,
+            grantResults: IntArray
     ) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {

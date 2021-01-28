@@ -6,11 +6,12 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import androidx.camera.core.CameraX
 
 
 // Defines an overlay on which the boxes and text will be drawn.
 class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
-    SurfaceView(context, attributeSet), SurfaceHolder.Callback {
+        SurfaceView(context, attributeSet), SurfaceHolder.Callback {
 
     private val displayMetrics = context.resources.displayMetrics
 
@@ -26,6 +27,8 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
     // Create a Matrix for scaling
     private val output2OverlayTransform = Matrix().apply {
         preScale(xfactor, yfactor)
+        postScale(-1f, 1f, dpWidth / 2f, dpHeight / 2f)
+        if (cameraBackorFront == CameraX.LensFacing.FRONT) postScale(-1f, 1f, dpWidth / 2f, dpHeight / 2f)
     }
 
     // This var is assigned in FrameAnalyser.kt
@@ -44,6 +47,9 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
         color = Color.WHITE
     }
 
+    // for front camera flip
+    var cameraBackorFront: CameraX.LensFacing = CameraX.LensFacing.BACK
+
     override fun onDraw(canvas: Canvas?) {
         if (faceBoundingBoxes != null) {
             for (face in faceBoundingBoxes!!) {
@@ -51,10 +57,10 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
                 // Draw boxes and text
                 canvas?.drawRoundRect(processedBbox, 16f, 16f, boxPaint)
                 canvas?.drawText(
-                    face.label + ": " + (face.minDistance).toString(),
-                    processedBbox.centerX(),
-                    processedBbox.centerY(),
-                    textPaint
+                        face.label + ": " + (face.minDistance).toString(),
+                        processedBbox.centerX(),
+                        processedBbox.centerY(),
+                        textPaint
                 )
                 Log.e("Info", "Rect received ${processedBbox.toShortString()}")
             }

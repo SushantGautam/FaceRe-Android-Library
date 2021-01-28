@@ -24,10 +24,11 @@ class MainActivity : AppCompatActivity() {
             val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.bidhan)
 
             startFaceReActivity(
-                callerClass = this,
-                StudentName = "Student Name",
-                StudentID = "Student ID",
-                StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!
+                    callerClass = this,
+                    StudentName = "Student Name",
+                    StudentID = "Student ID",
+                    StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!,
+                    camera = "front"
             )
         }
     }
@@ -39,19 +40,29 @@ class MainActivity : AppCompatActivity() {
             val bundle: Bundle? = data?.extras
             val status = bundle?.getString("status")
             if (status == "success") {
+                val score = bundle.getDouble("score")
+                val maxScore = bundle.getDouble("maxScore")
                 val bitmap = BitmapFactory.decodeStream(
-                    this.openFileInput("myFaceReImage")
+                        this.openFileInput("myFaceReImage")
                 )
-                //access locally saved last analyzed frame if you need
-                Log.d("BITMAP VALUE", bitmap.toString())
-                successCallbackFunction()
+
+                //"bitmap variable contains the image obtained after recognition"
+                //"score variable contains the average score obtained after recognition"
+                //"maxScore variable contains the max score obtained after recognition"
+                Log.d("New Bitmap Received", bitmap.toString())
+                score.let { Log.d("Score", it.toString()) }
+                maxScore.let { Log.d("maxScore", it.toString()) }
+
+                successCallbackFunction(score, maxScore)
             } else errorCallbackFunction()
         }
     }
 
-    private fun successCallbackFunction() {
+    private fun successCallbackFunction(score: Double, maxScore: Double) {
         //TODO: write what you want to do after success
-        var intent = Intent(this, NewActivity::class.java)
+        val intent = Intent(this, NewActivity::class.java)
+        intent.putExtra("score", score)
+        intent.putExtra("maxScore", maxScore)
         startActivity(intent)
         return
     }
