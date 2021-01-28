@@ -23,7 +23,7 @@
 
         <activity
             android:name="com.ubl.FaceReApp.MainActivity"
-            android:screenOrientation="landscape">
+            android:screenOrientation="userPortrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -31,7 +31,7 @@
         </activity>
         <activity
             android:name="com.ubl.FaceReApp.NewActivity"
-            android:screenOrientation="landscape">
+            android:screenOrientation="userPortrait">
         </activity>
     </application>
 

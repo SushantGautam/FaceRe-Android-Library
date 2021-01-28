@@ -5,7 +5,6 @@
     <application>
         <activity
             android:name="com.ubl.FaceRe.FaceReActivity"
-            android:screenOrientation="landscape" />
-
+            android:screenOrientation="userPortrait" />
     </application>
 </manifest>
