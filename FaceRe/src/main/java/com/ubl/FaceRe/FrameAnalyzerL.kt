@@ -10,6 +10,7 @@ import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.camera.core.ImageAnalysis
@@ -34,10 +35,10 @@ class FrameAnalyser(
 
     private var summation: Double = 0.0,
     private var accuracyScore: Double = 0.0,
-    var maxThreshold: Double = 80.0,  // the threshold value that will be accepted as verified
+    var maxThreshold: Double = 70.0,  // the threshold value that will be accepted as verified
     private var frameCounter: Int = 0,
     var finalAverage: Double = 0.0,
-     var maxScore: Double = 0.0
+    var maxScore: Double = 0.0
 
 ) : ImageAnalysis.Analyzer {
 
@@ -159,6 +160,7 @@ class FrameAnalyser(
                             //after 10 frames compared trigger callback function
                             if (frameCounter == 10) {
                                 finalAverage = summation / frameCounter
+
                                 Handler(Looper.getMainLooper()).post {
                                     //pause AI process here
                                     callbackAfterComplete()
@@ -187,6 +189,13 @@ class FrameAnalyser(
 
                                         (facere?.activityResources?.get("retry"))!!.visibility =
                                             View.VISIBLE
+                                    } else {
+                                        //making these buttons only visible after 10 frames are compared
+                                        (facere?.activityResources?.get("skip"))!!.visibility =
+                                            View.VISIBLE
+                                        ((facere?.activityResources?.get("skip")) as Button).text =
+                                            "Continue"
+                                        ((facere?.activityResources?.get("skip")) as Button).setBackgroundColor(Color.GREEN)
                                     }
 
                                 }

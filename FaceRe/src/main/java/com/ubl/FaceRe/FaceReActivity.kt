@@ -115,9 +115,10 @@ class FaceReActivity : AppCompatActivity() {
         if (faceRe.frameAnalyser.finalAverage < faceRe.frameAnalyser.maxThreshold) {
             CameraX.unbindAll()
         } else {
-            val toastMessage = Toast.makeText(this, "Success", Toast.LENGTH_LONG)
-            toastMessage.show()
-            navigateToNewActivity()
+            CameraX.unbindAll()
+//            val toastMessage = Toast.makeText(this, "Success", Toast.LENGTH_LONG)
+//            toastMessage.show()
+//            navigateToNewActivity()
         }
         return
     }
