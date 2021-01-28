@@ -18,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
+
     <TextureView
         android:id="@+id/camera_textureView"
         android:layout_width="0dp"
@@ -27,26 +28,34 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
+        app:layout_constraintVertical_bias="1.0" />
 
     <LinearLayout
         android:id="@+id/nameLinear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:layout_marginEnd="24dp"
         android:background="#80A2CA74"
         android:orientation="vertical"
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintStart_toStartOf="parent">
 
+        <ImageView
+            android:id="@+id/StudentImageView"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_alignTop="@id/bbox_overlay"
+            android:layout_alignEnd="@id/bbox_overlay"
+            android:layout_margin="20dp"
+            android:maxWidth="200dp"
+            tools:layout_editor_absoluteX="20dp"
+            tools:layout_editor_absoluteY="0dp"
+            tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
             android:id="@+id/StudentName"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
             android:layout_marginBottom="10dp"
@@ -59,7 +68,7 @@
 
         <TextView
             android:id="@+id/StudentID"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="StudentID"
             android:textAlignment="center"

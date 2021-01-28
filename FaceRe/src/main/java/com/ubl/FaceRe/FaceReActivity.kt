@@ -1,7 +1,6 @@
 package com.ubl.FaceRe
 
 import android.Manifest
-import android.R.attr.src
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,6 +10,7 @@ import android.os.Bundle
 import android.view.TextureView
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +18,6 @@ import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.FileNotFoundException
-import java.net.URL
 import java.util.concurrent.Executors
 
 
@@ -27,7 +26,7 @@ class FaceReActivity : AppCompatActivity() {
     private var faceRe = FaceRe()
     private val REQUEST_CODE_PERMISSIONS = 10
     private val REQUIRED_PERMISSIONS =
-            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private lateinit var cameraTextureView: TextureView
 
     private lateinit var studentName: String
@@ -35,14 +34,16 @@ class FaceReActivity : AppCompatActivity() {
     private lateinit var studentBitmapFileName: String
     private lateinit var studentBitmap: Bitmap
     private lateinit var cameraBackorFront: CameraX.LensFacing
+    private lateinit var StudentImageView: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_re)
-
         studentName = intent.getStringExtra("StudentName").toString()
         studentID = intent.getStringExtra("StudentID").toString()
         studentBitmapFileName = intent.getStringExtra("StudentBitmapFileName").toString()
+
+        StudentImageView = findViewById(R.id.StudentImageView)
 
         // choose camera
         val cameraBackorFront_tmp = intent.getStringExtra("cameraBackorFront").toString()
@@ -57,6 +58,8 @@ class FaceReActivity : AppCompatActivity() {
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
         }
+
+        StudentImageView.setImageBitmap(studentBitmap)
 
         findViewById<TextView>(R.id.StudentName).text = studentName
         findViewById<TextView>(R.id.StudentID).text = studentID
@@ -82,9 +85,9 @@ class FaceReActivity : AppCompatActivity() {
 
 
         val resources = mapOf(
-                "accuracy" to findViewById(R.id.latestaccuracy) as TextView,
-                "retry" to findViewById(R.id.retry) as Button,
-                "skip" to findViewById(R.id.skip) as Button
+            "accuracy" to findViewById(R.id.latestaccuracy) as TextView,
+            "retry" to findViewById(R.id.retry) as Button,
+            "skip" to findViewById(R.id.skip) as Button
         )
 
         resources["retry"]?.setOnClickListener {
@@ -100,7 +103,7 @@ class FaceReActivity : AppCompatActivity() {
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED
+            PackageManager.PERMISSION_GRANTED
         ) {
             // Read image data
             loadImageToCompare()
@@ -130,7 +133,7 @@ class FaceReActivity : AppCompatActivity() {
 
     private fun loadImageToCompare() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED
+            PackageManager.PERMISSION_GRANTED
         ) {
             // Log.d("USER INPUT BIMAP", studentBitmap.toString())
 //            faceRe.loadImageUrlToCompare(
@@ -138,8 +141,8 @@ class FaceReActivity : AppCompatActivity() {
 //                "Sushant"
 //            )
             faceRe.loadBitmapToCompare(
-                    studentBitmap,
-                    "Bidhan"
+                studentBitmap,
+                "Bidhan"
             )
         }
     }
@@ -161,7 +164,7 @@ class FaceReActivity : AppCompatActivity() {
         // FrameAnalyser -> fetches camera frames and makes them in the analyse() method.
         val analyzerConfig = ImageAnalysisConfig.Builder().apply {
             setImageReaderMode(
-                    ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE
+                ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE
             )
             setLensFacing(cameraBackorFront)
         }.build()
@@ -176,9 +179,9 @@ class FaceReActivity : AppCompatActivity() {
 
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<String>,
-            grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
     ) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {

@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Start the FaceRe Activity After Start Button is pressed
+        button = findViewById(R.id.button)
         button.setOnClickListener {
 
             // You need to pass various options as specified here
