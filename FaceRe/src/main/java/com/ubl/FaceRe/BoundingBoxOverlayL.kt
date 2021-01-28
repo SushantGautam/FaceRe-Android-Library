@@ -20,8 +20,8 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
 
     // Our boxes will be predicted on a 640 * 480 image. So, we need to scale the boxes to the device screen's width and
     // height
-    private val xfactor = dpWidth.toFloat() / 640f
-    private val yfactor = dpHeight.toFloat() / 480f
+    private val xfactor = dpWidth.toFloat() / 480f
+    private val yfactor = dpHeight.toFloat() / 640f
 
     // Create a Matrix for scaling
     private val output2OverlayTransform = Matrix().apply {
