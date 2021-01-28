@@ -10,7 +10,6 @@ class NewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new)
-        var sdsd = getIntent().extras
         val scoret = getIntent().extras?.getDouble("score")
         val maxScoret = getIntent().extras?.getDouble("maxScore")
         val bitmap = BitmapFactory.decodeStream(
