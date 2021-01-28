@@ -112,7 +112,7 @@ class FaceReActivity : AppCompatActivity() {
 
 
     private fun successCallbackFunction() {
-        if (faceRe.frameAnalyser.finalAverage < faceRe.frameAnalyser.maxScore) {
+        if (faceRe.frameAnalyser.finalAverage < faceRe.frameAnalyser.maxThreshold) {
             CameraX.unbindAll()
         } else {
             val toastMessage = Toast.makeText(this, "Success", Toast.LENGTH_LONG)

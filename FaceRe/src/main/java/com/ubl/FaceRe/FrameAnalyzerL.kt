@@ -28,15 +28,16 @@ import kotlin.reflect.KFunction0
 
 // Analyser class to process frames and produce detections.
 class FrameAnalyser(
-        private var context: Context,
-        private var boundingBoxOverlay: BoundingBoxOverlay,
-        private var facere: FaceRe?,
+    private var context: Context,
+    private var boundingBoxOverlay: BoundingBoxOverlay,
+    private var facere: FaceRe?,
 
-        private var summation: Double = 0.0,
-        private var accuracyScore: Double = 0.0,
-        var maxScore: Double = 0.0,
-        private var frameCounter: Int = 0,
-        var finalAverage: Double = 0.0
+    private var summation: Double = 0.0,
+    private var accuracyScore: Double = 0.0,
+    var maxThreshold: Double = 80.0,  // the threshold value that will be accepted as verified
+    private var frameCounter: Int = 0,
+    var finalAverage: Double = 0.0,
+     var maxScore: Double = 0.0
 
 ) : ImageAnalysis.Analyzer {
 
@@ -44,8 +45,8 @@ class FrameAnalyser(
 
     // Configure the FirebaseVisionFaceDetector
     private val realTimeOpts = FaceDetectorOptions.Builder()
-            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
-            .build()
+        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+        .build()
 
     private val faceDetector = FaceDetection.getClient(realTimeOpts)
 
@@ -87,11 +88,11 @@ class FrameAnalyser(
 
             // Perform face detection
             val inputImage = InputImage.fromByteArray(
-                    BitmaptoNv21(bitmap),
-                    480,
-                    640,
-                    0,
-                    IMAGE_FORMAT_NV21
+                BitmaptoNv21(bitmap),
+                480,
+                640,
+                0,
+                IMAGE_FORMAT_NV21
             )
 
             faceDetector.process(inputImage).addOnSuccessListener { faces ->
@@ -124,7 +125,7 @@ class FrameAnalyser(
                             else
                                 score = CosineSimilarityToAccuracy(scoreRaw)
                             val accuracyToShowInBBox =
-                                    String.format("%.2f", score) + " Or:" + scoreRaw
+                                String.format("%.2f", score) + " Or:" + scoreRaw
 
                             //tracking number of frames analyzed and accuracy
                             frameCounter++
@@ -137,21 +138,21 @@ class FrameAnalyser(
 
 
                             Log.i(
-                                    "Model", "Person identified as ${detectedFaceName} with " +
-                                    "confidence of ${accuracyToShowInBBox} %"
+                                "Model", "Person identified as ${detectedFaceName} with " +
+                                        "confidence of ${accuracyToShowInBBox} %"
                             )
                             // Push the results in form of a Prediction.
                             predictions.add(
-                                    Prediction(
-                                            face.boundingBox,
-                                            detectedFaceName,
-                                            accuracyToShowInBBox
-                                    )
+                                Prediction(
+                                    face.boundingBox,
+                                    detectedFaceName,
+                                    accuracyToShowInBBox
+                                )
                             )
 
                             Handler(Looper.getMainLooper()).post {
                                 (facere?.activityResources?.get("accuracy") as TextView).text =
-                                        String.format("%.2f", score) + "%"
+                                    String.format("%.2f", score) + "%"
 
                             }
 
@@ -167,7 +168,8 @@ class FrameAnalyser(
                                     try {
                                         val bytes = ByteArrayOutputStream()
                                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-                                        val fo: FileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)
+                                        val fo: FileOutputStream =
+                                            context.openFileOutput(fileName, Context.MODE_PRIVATE)
                                         fo.write(bytes.toByteArray())
                                         // remember close file output
                                         fo.close()
@@ -178,13 +180,13 @@ class FrameAnalyser(
 
 
                                     //show the retry and skip button overly
-                                    if (finalAverage < maxScore) {
+                                    if (finalAverage < maxThreshold) {
                                         //making these buttons only visible after 10 frames are compared
                                         (facere?.activityResources?.get("skip"))!!.visibility =
-                                                View.VISIBLE
+                                            View.VISIBLE
 
                                         (facere?.activityResources?.get("retry"))!!.visibility =
-                                                View.VISIBLE
+                                            View.VISIBLE
                                     }
 
                                 }
@@ -206,9 +208,9 @@ class FrameAnalyser(
 
                 }.start()
             }
-                    .addOnFailureListener { e ->
-                        Log.e("Error", e.message.toString())
-                    }
+                .addOnFailureListener { e ->
+                    Log.e("Error", e.message.toString())
+                }
         }
     }
 
@@ -258,8 +260,8 @@ class FrameAnalyser(
         val argb = IntArray(bitmap.width * bitmap.height)
         bitmap.getPixels(argb, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
         val yuv = ByteArray(
-                bitmap.height * bitmap.width + 2 * Math.ceil(bitmap.height / 2.0).toInt()
-                        * Math.ceil(bitmap.width / 2.0).toInt()
+            bitmap.height * bitmap.width + 2 * Math.ceil(bitmap.height / 2.0).toInt()
+                    * Math.ceil(bitmap.width / 2.0).toInt()
         )
         encodeYUV420SP(yuv, argb, bitmap.width, bitmap.height)
         return yuv
