@@ -138,8 +138,8 @@ class FaceRe {
             else -> return
         }
         matrix.postRotate(-rotationDegrees.toFloat(), centerX, centerY)
-        matrix.postScale(2f, 1f)
-        matrix.postTranslate(-centerX, 0f)
+        matrix.postScale(1f, 1f)
+//        matrix.postTranslate(-centerX, 0f)
         cameraTextureView.setTransform(matrix)
     }
 

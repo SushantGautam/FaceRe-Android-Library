@@ -28,15 +28,15 @@ import kotlin.reflect.KFunction0
 
 // Analyser class to process frames and produce detections.
 class FrameAnalyser(
-    private var context: Context,
-    private var boundingBoxOverlay: BoundingBoxOverlay,
-    private var facere: FaceRe?,
+        private var context: Context,
+        private var boundingBoxOverlay: BoundingBoxOverlay,
+        private var facere: FaceRe?,
 
-    private var summation: Double = 0.0,
-    private var accuracyScore: Double = 0.0,
-    var maxScore: Double = 80.0,
-    private var frameCounter: Int = 0,
-    var finalAverage: Double = 0.0
+        private var summation: Double = 0.0,
+        private var accuracyScore: Double = 0.0,
+        var maxScore: Double = 80.0,
+        private var frameCounter: Int = 0,
+        var finalAverage: Double = 0.0
 
 ) : ImageAnalysis.Analyzer {
 
@@ -44,8 +44,8 @@ class FrameAnalyser(
 
     // Configure the FirebaseVisionFaceDetector
     private val realTimeOpts = FaceDetectorOptions.Builder()
-        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
-        .build()
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            .build()
 
     private val faceDetector = FaceDetection.getClient(realTimeOpts)
 
@@ -62,9 +62,10 @@ class FrameAnalyser(
     private val model = FaceNetModel(context)
 
 
-    private fun flip(d: Bitmap): BitmapDrawable {
+    private fun flip(d: Bitmap, rotationDegrees: Int): BitmapDrawable {
         val m = Matrix()
-        m.preScale((-1).toFloat(), 1F)
+//        m.preScale((-1).toFloat(), 1F)
+        m.postRotate(rotationDegrees.toFloat());
         val dst = Bitmap.createBitmap(d, 0, 0, d.width, d.height, m, false)
         dst.density = DisplayMetrics.DENSITY_DEFAULT
         return BitmapDrawable(dst)
@@ -76,7 +77,7 @@ class FrameAnalyser(
 
         // android.media.Image -> android.graphics.Bitmap
         var bitmap = toBitmap(image?.image!!)
-        bitmap = flip(bitmap).bitmap
+        bitmap = flip(bitmap, rotationDegrees).bitmap
         // If the previous frame is still being processed, then skip this frame
         if (isProcessing.get()) {
             return
@@ -87,8 +88,8 @@ class FrameAnalyser(
             // Perform face detection
             val inputImage = InputImage.fromByteArray(
                 BitmaptoNv21(bitmap),
-                640,
                 480,
+                640,
                 0,
                 IMAGE_FORMAT_NV21
             )
@@ -123,7 +124,7 @@ class FrameAnalyser(
                             else
                                 score = CosineSimilarityToAccuracy(scoreRaw)
                             val accuracyToShowInBBox =
-                                String.format("%.2f", score) + " Or:" + scoreRaw
+                                    String.format("%.2f", score) + " Or:" + scoreRaw
 
                             //tracking number of frames analyzed and accuracy
                             frameCounter++
@@ -132,21 +133,21 @@ class FrameAnalyser(
 
 
                             Log.i(
-                                "Model", "Person identified as ${detectedFaceName} with " +
-                                        "confidence of ${accuracyToShowInBBox} %"
+                                    "Model", "Person identified as ${detectedFaceName} with " +
+                                    "confidence of ${accuracyToShowInBBox} %"
                             )
                             // Push the results in form of a Prediction.
                             predictions.add(
-                                Prediction(
-                                    face.boundingBox,
-                                    detectedFaceName,
-                                    accuracyToShowInBBox
-                                )
+                                    Prediction(
+                                            face.boundingBox,
+                                            detectedFaceName,
+                                            accuracyToShowInBBox
+                                    )
                             )
 
                             Handler(Looper.getMainLooper()).post {
                                 (facere?.activityResources?.get("accuracy") as TextView).text =
-                                    String.format("%.2f", score) + "%"
+                                        String.format("%.2f", score) + "%"
 
                             }
 
@@ -176,10 +177,10 @@ class FrameAnalyser(
                                     if (finalAverage < maxScore) {
                                         //making these buttons only visible after 10 frames are compared
                                         (facere?.activityResources?.get("skip"))!!.visibility =
-                                            View.VISIBLE
+                                                View.VISIBLE
 
                                         (facere?.activityResources?.get("retry"))!!.visibility =
-                                            View.VISIBLE
+                                                View.VISIBLE
                                     }
 
                                 }
@@ -201,9 +202,9 @@ class FrameAnalyser(
 
                 }.start()
             }
-                .addOnFailureListener { e ->
-                    Log.e("Error", e.message.toString())
-                }
+                    .addOnFailureListener { e ->
+                        Log.e("Error", e.message.toString())
+                    }
         }
     }
 
@@ -253,8 +254,8 @@ class FrameAnalyser(
         val argb = IntArray(bitmap.width * bitmap.height)
         bitmap.getPixels(argb, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
         val yuv = ByteArray(
-            bitmap.height * bitmap.width + 2 * Math.ceil(bitmap.height / 2.0).toInt()
-                    * Math.ceil(bitmap.width / 2.0).toInt()
+                bitmap.height * bitmap.width + 2 * Math.ceil(bitmap.height / 2.0).toInt()
+                        * Math.ceil(bitmap.width / 2.0).toInt()
         )
         encodeYUV420SP(yuv, argb, bitmap.width, bitmap.height)
         return yuv
