@@ -136,7 +136,7 @@ class FaceReActivity : AppCompatActivity() {
     // Start the camera preview once the permissions are granted.
     private fun startCamera() {
         val previewConfig = PreviewConfig.Builder().apply {
-            setLensFacing(CameraX.LensFacing.FRONT)
+            setLensFacing(CameraX.LensFacing.BACK)
         }.build()
 
         val preview = Preview(previewConfig)
@@ -152,7 +152,7 @@ class FaceReActivity : AppCompatActivity() {
             setImageReaderMode(
                 ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE
             )
-            setLensFacing(CameraX.LensFacing.FRONT)
+            setLensFacing(CameraX.LensFacing.BACK)
         }.build()
 
         val analyzerUseCase = ImageAnalysis(analyzerConfig).apply {
