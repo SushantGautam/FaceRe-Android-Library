@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">FaceRe Android</string>
     <string name="button">Button</string>
-    <string name="Click_Me">Click Me</string>
+    <string name="Click_Me">Start</string>
 </resources>

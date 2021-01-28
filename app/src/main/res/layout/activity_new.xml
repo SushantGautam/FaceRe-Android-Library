@@ -54,9 +54,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif"
-                android:text="TextView"
                 android:textSize="40sp"
-                tools:text="Score" />
+                android:text="Score" />
 
             <TextView
                 android:id="@+id/score"

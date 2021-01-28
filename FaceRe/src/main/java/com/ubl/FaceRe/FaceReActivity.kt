@@ -80,7 +80,6 @@ class FaceReActivity : AppCompatActivity() {
         boundingBoxOverlay.setWillNotDraw(false)
         boundingBoxOverlay.setZOrderOnTop(true)
 
-        boundingBoxOverlay.cameraBackorFront = cameraBackorFront
 
         val resources = mapOf(
                 "accuracy" to findViewById(R.id.latestaccuracy) as TextView,
@@ -96,7 +95,7 @@ class FaceReActivity : AppCompatActivity() {
         resources["skip"]?.setOnClickListener {
             navigateToNewActivity()
         }
-
+        boundingBoxOverlay.cameraBackorFront = cameraBackorFront
         faceRe.initializeFrame(boundingBoxOverlay, this, ::successCallbackFunction, resources)
 
 

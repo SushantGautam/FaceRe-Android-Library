@@ -34,7 +34,7 @@ class FrameAnalyser(
 
         private var summation: Double = 0.0,
         private var accuracyScore: Double = 0.0,
-        var maxScore: Double = 80.0,
+        var maxScore: Double = 0.0,
         private var frameCounter: Int = 0,
         var finalAverage: Double = 0.0
 
@@ -87,11 +87,11 @@ class FrameAnalyser(
 
             // Perform face detection
             val inputImage = InputImage.fromByteArray(
-                BitmaptoNv21(bitmap),
-                480,
-                640,
-                0,
-                IMAGE_FORMAT_NV21
+                    BitmaptoNv21(bitmap),
+                    480,
+                    640,
+                    0,
+                    IMAGE_FORMAT_NV21
             )
 
             faceDetector.process(inputImage).addOnSuccessListener { faces ->
@@ -129,6 +129,10 @@ class FrameAnalyser(
                             //tracking number of frames analyzed and accuracy
                             frameCounter++
                             accuracyScore = score.toDouble()
+
+//                            #update max score
+                            if (maxScore < accuracyScore) maxScore = accuracyScore
+
                             summation += accuracyScore
 
 

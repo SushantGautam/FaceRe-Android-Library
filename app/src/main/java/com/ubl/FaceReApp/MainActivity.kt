@@ -9,6 +9,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.ubl.FaceRe.saveBitmap
 import com.ubl.FaceRe.startFaceReActivity
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,7 +29,7 @@ class MainActivity : AppCompatActivity() {
                     StudentName = "Student Name",
                     StudentID = "Student ID",
                     StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!,
-                    camera = "front"
+                    camera = if (CameraSwitch.isChecked) "front" else "back"
             )
         }
     }

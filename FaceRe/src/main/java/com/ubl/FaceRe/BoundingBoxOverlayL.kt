@@ -24,11 +24,18 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
     private val xfactor = dpWidth.toFloat() / 480f
     private val yfactor = dpHeight.toFloat() / 640f
 
-    // Create a Matrix for scaling
-    private val output2OverlayTransform = Matrix().apply {
+    // Create a Matrix for scaling the bbox coordinates ( for REAR camera )
+    private val output2OverlayTransformRearLens = Matrix().apply {
+        preScale(xfactor, yfactor)
+
+    }
+
+    // Create a Matrix for scaling the bbox coordinates ( for FRONT camera )
+    // For the front camera, we need to have an additional postScale(), so as to avoid
+    // mirror images of boxes.
+    private val output2OverlayTransformFrontLens = Matrix().apply {
         preScale(xfactor, yfactor)
         postScale(-1f, 1f, dpWidth / 2f, dpHeight / 2f)
-        if (cameraBackorFront == CameraX.LensFacing.FRONT) postScale(-1f, 1f, dpWidth / 2f, dpHeight / 2f)
     }
 
     // This var is assigned in FrameAnalyser.kt
@@ -70,7 +77,10 @@ class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
     // Apply the scale transform matrix to the boxes.
     private fun processBBox(bbox: Rect): RectF {
         val rectf = RectF(bbox)
-        output2OverlayTransform.mapRect(rectf)
+        when (cameraBackorFront == CameraX.LensFacing.FRONT) {
+            true -> output2OverlayTransformFrontLens.mapRect(rectf)
+            false -> output2OverlayTransformRearLens.mapRect(rectf)
+        }
         return rectf
     }
 

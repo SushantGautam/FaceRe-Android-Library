@@ -1,23 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="50sp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        tools:layout_editor_absoluteX="221dp"
-        tools:layout_editor_absoluteY="225dp">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="497dp"
+            android:foregroundGravity="center_horizontal"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:text="FaceRe Android Library Demo" />
+
+        <Switch
+            android:id="@+id/CameraSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20sp"
+            android:checked="false"
+            android:text="FrontCamera?" />
 
         <Button
             android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="122dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="@string/Click_Me" />
-    </RelativeLayout>
+            android:text="@string/Click_Me"
+            android:textSize="20sp" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
