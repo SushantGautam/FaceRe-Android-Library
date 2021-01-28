@@ -10,8 +10,8 @@ class NewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new)
-        val scoret = getIntent().extras?.getDouble("score")
-        val maxScoret = getIntent().extras?.getDouble("maxScore")
+        val scoret = intent.extras?.getDouble("score")
+        val maxScoret = intent.extras?.getDouble("maxScore")
         val bitmap = BitmapFactory.decodeStream(
                 this.openFileInput("myFaceReImage")
         )
