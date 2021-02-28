@@ -42,7 +42,7 @@ class FrameAnalyser(
 
 ) : ImageAnalysis.Analyzer {
 
-    private val useL2Norm = false
+    private val useL2Norm = true
 
     // Configure the FirebaseVisionFaceDetector
     private val realTimeOpts = FaceDetectorOptions.Builder()
@@ -77,9 +77,11 @@ class FrameAnalyser(
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun analyze(image: ImageProxy?, rotationDegrees: Int) {
 
+
+        var bitmap = facere!!.cameraTextureView.bitmap
         // android.media.Image -> android.graphics.Bitmap
-        var bitmap = toBitmap(image?.image!!)
-        bitmap = flip(bitmap, rotationDegrees).bitmap
+//        var bitmap = toBitmap(image?.image!!)
+        bitmap = flip(bitmap!!, 0).bitmap
         // If the previous frame is still being processed, then skip this frame
         if (isProcessing.get()) {
             return
@@ -90,8 +92,8 @@ class FrameAnalyser(
             // Perform face detection
             val inputImage = InputImage.fromByteArray(
                 BitmaptoNv21(bitmap),
-                480,
-                640,
+                bitmap.width,
+                bitmap.height,
                 0,
                 IMAGE_FORMAT_NV21
             )
@@ -109,6 +111,7 @@ class FrameAnalyser(
                             Log.i("Model", "New frame received.")
 
                             // Compute L2 norms and store them.
+
                             val norms = FloatArray(faceList.size)
                             for (i in 0 until faceList.size) {
                                 if (useL2Norm)
@@ -116,6 +119,35 @@ class FrameAnalyser(
                                 else
                                     norms[i] = cosineSimilarity(subject, faceList[i].second)
                             }
+
+                            val sampleDataOutput = ArrayList<Pair<Float, String>>()
+
+                            for (i in 0 until (facere?.SampleImagesEmbeddingsNamePairs?.size
+                                ?: 0)) {
+                                if (useL2Norm)
+                                    sampleDataOutput.add(
+                                        Pair(
+                                            L2Norm(
+                                                subject,
+                                                facere?.SampleImagesEmbeddingsNamePairs!![i].second
+                                            ), facere?.SampleImagesEmbeddingsNamePairs!![i].first
+                                        )
+                                    )
+                                else
+                                    sampleDataOutput.add(
+                                        Pair(
+                                            cosineSimilarity(
+                                                subject,
+                                                facere?.SampleImagesEmbeddingsNamePairs!![i].second
+                                            ), facere?.SampleImagesEmbeddingsNamePairs!![i].first
+                                        )
+                                    )
+
+                            }
+                            //add latest
+                            sampleDataOutput.add(Pair(norms.get(0), "Original"))
+
+                            val position = sampleDataOutput.sortBy { it.first }
                             // Calculate the minimum L2 distance from the stored L2 norms.
                             val prediction = faceList[norms.indexOf(norms.min()!!)]
                             val detectedFaceName = prediction.first
@@ -195,7 +227,9 @@ class FrameAnalyser(
                                             View.VISIBLE
                                         ((facere?.activityResources?.get("skip")) as Button).text =
                                             "Continue"
-                                        ((facere?.activityResources?.get("skip")) as Button).setBackgroundColor(Color.GREEN)
+                                        ((facere?.activityResources?.get("skip")) as Button).setBackgroundColor(
+                                            Color.GREEN
+                                        )
                                     }
 
                                 }

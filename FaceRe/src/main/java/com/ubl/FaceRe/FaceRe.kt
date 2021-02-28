@@ -20,7 +20,9 @@ import kotlin.reflect.KFunction0
 
 
 class FaceRe {
+    lateinit var cameraTextureView: TextureView
 
+    val SampleImagesEmbeddingsNamePairs = ArrayList<Pair<String, FloatArray>>()
     private var imageData = ArrayList<Pair<String, FloatArray>>()
 
     // Use Firebase MLKit to crop faces from images present in "/images" folder.
@@ -45,6 +47,10 @@ class FaceRe {
         model = FaceNetModel(context)
         this.rearCamera = rearCamera
         return model
+    }
+
+    fun initializecameraTextureView(textureview: TextureView) {
+        this.cameraTextureView = textureview;
     }
 
     lateinit var successCallback: KFunction0<Unit>
@@ -126,10 +132,39 @@ class FaceRe {
         detector.process(inputImage).addOnSuccessListener(successListener)
     }
 
+    // This function is used to scan for sample images in the directory
+    fun scanSampleFace(sample: Bitmap, PhotoName: String) {
+        val inputImage = InputImage.fromByteArray(
+            bitmapToNV21(sample),
+            sample.width,
+            sample.height,
+            0,
+            InputImage.IMAGE_FORMAT_NV21
+        )
+        val successListener = OnSuccessListener<List<Face?>> { faces ->
+            if (faces.isNotEmpty()) {
+                SampleImagesEmbeddingsNamePairs.add(
+                    Pair(
+                        PhotoName,
+                        if (cropWithBBoxes) {
+                            model!!.getFaceEmbedding(sample, faces[0]!!.boundingBox, false)
+                        } else {
+                            model!!.getFaceEmbeddingWithoutBBox(sample, false)
+                        }
+                    )
+
+
+                )
+                print(".")
+            }
+        }
+        detector.process(inputImage).addOnSuccessListener(successListener)
+    }
+
     fun updateTransform(cameraTextureView: TextureView) {
         val matrix = Matrix()
-        val centerX = cameraTextureView.width.div(2f)
-        val centerY = cameraTextureView.height.div(2f)
+        val centerX = cameraTextureView.width.div(1f)
+        val centerY = cameraTextureView.height.div(1f)
         val rotationDegrees = when (cameraTextureView.display.rotation) {
             Surface.ROTATION_0 -> 0
             Surface.ROTATION_90 -> 90
@@ -137,8 +172,8 @@ class FaceRe {
             Surface.ROTATION_270 -> 270
             else -> return
         }
-        matrix.postRotate(-rotationDegrees.toFloat(), centerX, centerY)
-        matrix.postScale(1f, 1f)
+//        matrix.postRotate(-rotationDegrees.toFloat(), centerX, centerY)
+//        matrix.postScale(1f, 1f)
 //        matrix.postTranslate(-centerX, 0f)
         cameraTextureView.setTransform(matrix)
     }

@@ -17,7 +17,7 @@ class FaceNetModel(context: Context) {
     private var interpreter: Interpreter
 
     // Input image size for FaceNet model.
-    private val imgSize = 160
+    private val imgSize = 112
 
     init {
         // Initialize TFLiteInterpreter
@@ -25,7 +25,7 @@ class FaceNetModel(context: Context) {
             setNumThreads(4)
         }
         interpreter = Interpreter(
-            FileUtil.loadMappedFile(context, "facenet_int8_quant.tflite"),
+            FileUtil.loadMappedFile(context, "Vargfacenet_int8_quant.tflite"),
             interpreterOptions
         )
     }
@@ -38,6 +38,7 @@ class FaceNetModel(context: Context) {
                 cropRectFromBitmap(image, crop, preRotate)
             )
         )
+        var sush = cropRectFromBitmap(image, crop, preRotate)
         return s[0]
     }
 
@@ -54,7 +55,7 @@ class FaceNetModel(context: Context) {
     // Run the FaceNet model.
     private fun runFaceNet(inputs: Any): Array<FloatArray> {
         val t1 = System.currentTimeMillis()
-        val outputs = Array(1) { FloatArray(128) }
+        val outputs = Array(1) { FloatArray(512) }
         interpreter.run(inputs, outputs)
         Log.i("Performance", "FaceNet Inference Speed in ms : ${System.currentTimeMillis() - t1}")
         return outputs

@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             // Student Name, Student ID and Bitmap of Student Face
             // onActivityResult is called after successfully completion of the Face Recognition
 
-            val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.bidhan)
+            val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.sushantylatest)
 
             startFaceReActivity(
                     callerClass = this,

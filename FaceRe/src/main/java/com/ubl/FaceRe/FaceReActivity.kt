@@ -7,16 +7,19 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Environment
+import android.util.Size
 import android.view.TextureView
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.Executors
 
@@ -78,6 +81,7 @@ class FaceReActivity : AppCompatActivity() {
         cameraTextureView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             faceRe.updateTransform(cameraTextureView)
         }
+        faceRe.initializecameraTextureView(cameraTextureView)
 
         // Necessary to keep the Overlay above the TextureView so that the boxes are visible.
         boundingBoxOverlay.setWillNotDraw(false)
@@ -106,8 +110,33 @@ class FaceReActivity : AppCompatActivity() {
             PackageManager.PERMISSION_GRANTED
         ) {
             // Read image data
+
+            scanStorageForSampleImages(File(Environment.getExternalStorageDirectory().absolutePath + "/SamplePhotos"))
             loadImageToCompare()
         }
+    }
+
+    private fun scanStorageForSampleImages(imagesDir: File) {
+//        if (imagesDir.exists() && imagesDir.isDirectory()) {
+//            for (image in imagesDir.listFiles()) {
+//                faceRe.scanSampleFace(BitmapFactory.decodeFile(image.absolutePath), image.name)
+//            }
+//            print("SampleImageLabelPairs:" + faceRe.SampleImagesEmbeddingsNamePairs.size)
+//            print("SampleImageLabelPairs:" + faceRe.SampleImagesEmbeddingsNamePairs.size)
+//
+//        }
+        val file = getAssets().open("300FaceEncodingvargfacenet.csv")
+        csvReader().open(file) {
+            readAllAsSequence().forEach { row ->
+                val myList: MutableList<Float> = mutableListOf()
+                for (item in row.listIterator()) myList.add(item.toFloat())
+//                _300FaceEncoding.add()
+                faceRe.SampleImagesEmbeddingsNamePairs.add(Pair("hancy", myList.toFloatArray() ))
+            }
+
+        }
+        print("here")
+
     }
 
 
@@ -152,6 +181,7 @@ class FaceReActivity : AppCompatActivity() {
     private fun startCamera() {
         val previewConfig = PreviewConfig.Builder().apply {
             setLensFacing(cameraBackorFront)
+            setTargetResolution(Size(cameraTextureView.width, cameraTextureView.height))
         }.build()
 
         val preview = Preview(previewConfig)
@@ -163,12 +193,14 @@ class FaceReActivity : AppCompatActivity() {
             faceRe.updateTransform(cameraTextureView)
         }
         // FrameAnalyser -> fetches camera frames and makes them in the analyse() method.
-        val analyzerConfig = ImageAnalysisConfig.Builder().apply {
-            setImageReaderMode(
-                ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE
-            )
-            setLensFacing(cameraBackorFront)
-        }.build()
+        val analyzerConfig = ImageAnalysisConfig.Builder()
+            .apply {
+                setImageReaderMode(
+                    ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE
+                )
+                setLensFacing(cameraBackorFront)
+
+            }.build()
 
         val analyzerUseCase = ImageAnalysis(analyzerConfig).apply {
             setAnalyzer(Executors.newSingleThreadExecutor(), faceRe.frameAnalyser)

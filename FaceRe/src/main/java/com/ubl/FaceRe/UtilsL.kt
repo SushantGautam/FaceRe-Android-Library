@@ -50,8 +50,8 @@ private fun encodeYUV420SP(yuv420sp: ByteArray, argb: IntArray, width: Int, heig
 
 
 fun NormToAccuracy(l2score: Float): Float {
-    val minTh = 2f
-    val maxTh = 6f
+    val minTh = 0.1f
+    val maxTh = .75f
     val clampedL2 = maxTh - l2score.coerceIn(minTh, maxTh)
     val percentage = (clampedL2) * 100 / (maxTh - minTh)
     return percentage
@@ -59,8 +59,8 @@ fun NormToAccuracy(l2score: Float): Float {
 
 
 fun CosineSimilarityToAccuracy(cosScore: Float): Float {
-    val minTh = .30f
-    val maxTh = .90f
+    val minTh = .20f
+    val maxTh = .75f
 
     if (cosScore > maxTh) return cosScore * 100
     else if (cosScore < minTh) return cosScore * 100
