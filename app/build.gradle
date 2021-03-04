@@ -40,7 +40,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     implementation project(path: ':FaceRe')
-//    implementation 'com.github.ublrandd:FaceRe-Android-Library:1.01'
+//    implementation 'com.github.ublrandd:FaceRe-Android:1.2'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
