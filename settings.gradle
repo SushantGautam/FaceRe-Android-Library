@@ -1,3 +1,4 @@
 include ':FaceRe'
 rootProject.name = 'FaceRe Android Library'
 include ':app'
+include ':openCVLibrary310'

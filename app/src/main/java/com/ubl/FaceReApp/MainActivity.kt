@@ -28,16 +28,30 @@ class MainActivity : AppCompatActivity() {
             // Student Name, Student ID and Bitmap of Student Face
             // onActivityResult is called after successfully completion of the Face Recognition
 
-            val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.sushantylatest)
+            val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.bidhan)
 
             startFaceReActivity(
-                    callerClass = this,
-                    StudentName = "Student Name",
-                    StudentID = "Student ID",
-                    StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!,
-                    camera = if (CameraSwitch.isChecked) "front" else "back"
+                callerClass = this,
+                StudentName = "Student Name",
+                StudentID = "Student ID",
+                StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!,
+                camera = if (CameraSwitch.isChecked) "front" else "back"
             )
         }
+
+
+//        //temp delete me
+//
+//        val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.sushantylatest)
+//
+//        startFaceReActivity(
+//            callerClass = this,
+//            StudentName = "Student Name",
+//            StudentID = "Student ID",
+//            StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!,
+//            camera = if (CameraSwitch.isChecked) "front" else "back"
+//        )
+//        //temp delete me
     }
 
 
@@ -59,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 
                 // image is already saved on the device after recognition with name: "myFaceReImage" . .  get get it back
                 val bitmap = BitmapFactory.decodeStream(
-                        this.openFileInput("myFaceReImage")
+                    this.openFileInput("myFaceReImage")
                 )
 
 

@@ -47,6 +47,7 @@ class FrameAnalyser(
     // Configure the FirebaseVisionFaceDetector
     private val realTimeOpts = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+        .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
         .build()
 
     private val faceDetector = FaceDetection.getClient(realTimeOpts)
@@ -107,7 +108,7 @@ class FrameAnalyser(
                             // Crop the frame using face.boundingBox.
                             // Convert the cropped Bitmap to a ByteBuffer.
                             // Finally, feed the ByteBuffer to the FaceNet model.
-                            val subject = model.getFaceEmbedding(bitmap, face.boundingBox, false)
+                            val subject = model.getFaceEmbedding(bitmap, face, false)
                             Log.i("Model", "New frame received.")
 
                             // Compute L2 norms and store them.
@@ -120,35 +121,51 @@ class FrameAnalyser(
                                     norms[i] = cosineSimilarity(subject, faceList[i].second)
                             }
 
-                            val sampleDataOutput = ArrayList<Pair<Float, String>>()
+//                            val sampleDataOutput = ArrayList<Pair<Float, String>>()
+//                            for (i in 0 until (facere?.SampleImagesEmbeddingsNamePairs?.size
+//                                ?: 0)) {
+//                                if (useL2Norm)
+//                                    sampleDataOutput.add(
+//                                        Pair(
+//                                            L2Norm(
+//                                                subject,
+//                                                facere?.SampleImagesEmbeddingsNamePairs!![i].second
+//                                            ), facere?.SampleImagesEmbeddingsNamePairs!![i].first
+//                                        )
+//                                    )
+//                                else
+//                                    sampleDataOutput.add(
+//                                        Pair(
+//                                            cosineSimilarity(
+//                                                subject,
+//                                                facere?.SampleImagesEmbeddingsNamePairs!![i].second
+//                                            ), facere?.SampleImagesEmbeddingsNamePairs!![i].first
+//                                        )
+//                                    )
+//
+//                            }
+//
+//                            //add latest
+//                            sampleDataOutput.add(Pair(norms.get(0), "Original"))
+//
+//                            sampleDataOutput.sortBy { it.first }
+//                            val total = sampleDataOutput.size
+//                            var maxLScore = sampleDataOutput.map { it.first }.max()
+//                            var minLScore = sampleDataOutput.map { it.first }.min()
+//
+//                            val score = 100- (norms.get(0)- minLScore!!)*100/(maxLScore!! - minLScore)
+//
+////                            val score = 100*(total- sampleDataOutput.withIndex()
+////                                .filter { (_, value) -> value.second == "Original" }.first().index)/total
+////
+//
+//                            val scoreRaw: Float = score.toFloat()
+//                            val detectedFaceName: String ="hancy"
+//
+//
 
-                            for (i in 0 until (facere?.SampleImagesEmbeddingsNamePairs?.size
-                                ?: 0)) {
-                                if (useL2Norm)
-                                    sampleDataOutput.add(
-                                        Pair(
-                                            L2Norm(
-                                                subject,
-                                                facere?.SampleImagesEmbeddingsNamePairs!![i].second
-                                            ), facere?.SampleImagesEmbeddingsNamePairs!![i].first
-                                        )
-                                    )
-                                else
-                                    sampleDataOutput.add(
-                                        Pair(
-                                            cosineSimilarity(
-                                                subject,
-                                                facere?.SampleImagesEmbeddingsNamePairs!![i].second
-                                            ), facere?.SampleImagesEmbeddingsNamePairs!![i].first
-                                        )
-                                    )
 
-                            }
-                            //add latest
-                            sampleDataOutput.add(Pair(norms.get(0), "Original"))
-
-                            val position = sampleDataOutput.sortBy { it.first }
-                            // Calculate the minimum L2 distance from the stored L2 norms.
+//                             Calculate the minimum L2 distance from the stored L2 norms.
                             val prediction = faceList[norms.indexOf(norms.min()!!)]
                             val detectedFaceName = prediction.first
                             val scoreRaw: Float = norms.min()!!
@@ -157,8 +174,10 @@ class FrameAnalyser(
                                 score = NormToAccuracy(scoreRaw)
                             else
                                 score = CosineSimilarityToAccuracy(scoreRaw)
+
+
                             val accuracyToShowInBBox =
-                                String.format("%.2f", score) + " Or:" + scoreRaw
+                                String.format("%.2f", score.toDouble()) + " Or:" + scoreRaw
 
                             //tracking number of frames analyzed and accuracy
                             frameCounter++
@@ -185,7 +204,7 @@ class FrameAnalyser(
 
                             Handler(Looper.getMainLooper()).post {
                                 (facere?.activityResources?.get("accuracy") as TextView).text =
-                                    String.format("%.2f", score) + "%"
+                                    String.format("%.2f", score.toDouble()) + "%"
 
                             }
 

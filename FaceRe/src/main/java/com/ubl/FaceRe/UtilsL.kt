@@ -50,8 +50,8 @@ private fun encodeYUV420SP(yuv420sp: ByteArray, argb: IntArray, width: Int, heig
 
 
 fun NormToAccuracy(l2score: Float): Float {
-    val minTh = 0.1f
-    val maxTh = .75f
+    val minTh = 2.0f
+    val maxTh = 5.0f
     val clampedL2 = maxTh - l2score.coerceIn(minTh, maxTh)
     val percentage = (clampedL2) * 100 / (maxTh - minTh)
     return percentage

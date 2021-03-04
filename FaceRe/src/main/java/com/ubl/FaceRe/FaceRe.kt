@@ -40,6 +40,7 @@ class FaceRe {
     // Initialize Firebase MLKit Face Detector
     private val accurateOps = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+        .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
         .build()
     private val detector = FaceDetection.getClient(accurateOps)
 
@@ -116,7 +117,7 @@ class FaceRe {
                     Pair(
                         sample.second,
                         if (cropWithBBoxes) {
-                            model!!.getFaceEmbedding(sample.first, faces[0]!!.boundingBox, false)
+                            model!!.getFaceEmbedding(sample.first, faces[0], false)
                         } else {
                             model!!.getFaceEmbeddingWithoutBBox(sample.first, false)
                         }
@@ -147,7 +148,7 @@ class FaceRe {
                     Pair(
                         PhotoName,
                         if (cropWithBBoxes) {
-                            model!!.getFaceEmbedding(sample, faces[0]!!.boundingBox, false)
+                            model!!.getFaceEmbedding(sample, faces[0]!!, false)
                         } else {
                             model!!.getFaceEmbeddingWithoutBBox(sample, false)
                         }

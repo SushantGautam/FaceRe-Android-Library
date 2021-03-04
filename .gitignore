@@ -12,3 +12,4 @@
 /captures
 .externalNativeBuild
 .cxx
+/openCVLibrary310/build/

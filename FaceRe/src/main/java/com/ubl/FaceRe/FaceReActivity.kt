@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.util.Size
 import android.view.TextureView
 import android.view.ViewGroup
@@ -19,6 +20,9 @@ import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import org.opencv.android.BaseLoaderCallback
+import org.opencv.android.LoaderCallbackInterface
+import org.opencv.android.OpenCVLoader
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.Executors
@@ -41,6 +45,19 @@ class FaceReActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!OpenCVLoader.initDebug()) {
+            Log.d(
+                "opencv",
+                "Internal OpenCV library not found. Using OpenCV Manager for initialization"
+            )
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback)
+        } else {
+            Log.d("opencv", "OpenCV library found inside package. Using it!")
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS)
+
+        }
+
+
         setContentView(R.layout.activity_face_re)
         studentName = intent.getStringExtra("StudentName").toString()
         studentID = intent.getStringExtra("StudentID").toString()
@@ -111,30 +128,32 @@ class FaceReActivity : AppCompatActivity() {
         ) {
             // Read image data
 
-            scanStorageForSampleImages(File(Environment.getExternalStorageDirectory().absolutePath + "/SamplePhotos"))
+//            scanStorageForSampleImages(File(Environment.getExternalStorageDirectory().absolutePath + "/SamplePhotos"))
             loadImageToCompare()
         }
     }
 
+
     private fun scanStorageForSampleImages(imagesDir: File) {
-//        if (imagesDir.exists() && imagesDir.isDirectory()) {
-//            for (image in imagesDir.listFiles()) {
-//                faceRe.scanSampleFace(BitmapFactory.decodeFile(image.absolutePath), image.name)
-//            }
-//            print("SampleImageLabelPairs:" + faceRe.SampleImagesEmbeddingsNamePairs.size)
-//            print("SampleImageLabelPairs:" + faceRe.SampleImagesEmbeddingsNamePairs.size)
-//
-//        }
-        val file = getAssets().open("300FaceEncodingvargfacenet.csv")
-        csvReader().open(file) {
-            readAllAsSequence().forEach { row ->
-                val myList: MutableList<Float> = mutableListOf()
-                for (item in row.listIterator()) myList.add(item.toFloat())
-//                _300FaceEncoding.add()
-                faceRe.SampleImagesEmbeddingsNamePairs.add(Pair("hancy", myList.toFloatArray() ))
+        if (imagesDir.exists() && imagesDir.isDirectory()) {
+            for (image in imagesDir.listFiles()) {
+                faceRe.scanSampleFace(BitmapFactory.decodeFile(image.absolutePath), image.name)
             }
+            print("SampleImageLabelPairs:" + faceRe.SampleImagesEmbeddingsNamePairs.size)
+            print("SampleImageLabelPairs:" + faceRe.SampleImagesEmbeddingsNamePairs.size)
 
         }
+
+//        val file = getAssets().open("300FaceEncodingvargfacenet.csv")
+//        csvReader().open(file) {
+//            readAllAsSequence().forEach { row ->
+//                val myList: MutableList<Float> = mutableListOf()
+//                for (item in row.listIterator()) myList.add(item.toFloat())
+////                _300FaceEncoding.add()
+//                faceRe.SampleImagesEmbeddingsNamePairs.add(Pair("hancy", myList.toFloatArray()))
+//            }
+//
+//        }
         print("here")
 
     }
@@ -226,6 +245,20 @@ class FaceReActivity : AppCompatActivity() {
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+
+    private val mLoaderCallback: BaseLoaderCallback = object : BaseLoaderCallback(this) {
+        override fun onManagerConnected(status: Int) {
+            when (status) {
+                SUCCESS -> {
+                    Log.i("OPENCV", "OpenCV loaded successfully")
+                }
+                else -> {
+                    super.onManagerConnected(status)
+                }
+            }
+        }
     }
 
 }
