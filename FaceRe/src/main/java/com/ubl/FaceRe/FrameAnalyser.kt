@@ -28,7 +28,6 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.ubl.FaceRe.BitmapUtils.Companion.flipBitmap
 import com.ubl.FaceRe.BitmapUtils.Companion.rotateBitmap
 import com.ubl.FaceRe.model.FaceNetModel
-import com.ubl.FaceRe.model.MaskDetectionModel
 import com.ubl.FaceRe.model.Models
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,8 +67,8 @@ class FrameAnalyser(
     private val metricToBeUsed = "cosine"
 
     // Use this variable to enable/disable mask detection.
-    private val isMaskDetectionOn = true
-    private val maskDetectionModel = MaskDetectionModel(context)
+    private val isMaskDetectionOn = false
+//    private val maskDetectionModel = MaskDetectionModel(context)
 
 
     init {
@@ -274,13 +273,13 @@ class FrameAnalyser(
                     subject = model.getFaceEmbedding(croppedBitmap)
 
                     // Perform face mask detection on the cropped frame Bitmap.
-                    var maskLabel = ""
-                    if (isMaskDetectionOn) {
-                        maskLabel = maskDetectionModel.detectMask(croppedBitmap)
-                    }
+                    val maskLabel = "no mask"
+//                    if (isMaskDetectionOn) {
+////                        maskLabel = maskDetectionModel.detectMask(croppedBitmap)
+//                    }
 
                     // Continue with the recognition if the user is not wearing a face mask
-                    if (maskLabel == maskDetectionModel.NO_MASK) {
+                    if (maskLabel == maskLabel) {
                         // Perform clustering ( grouping )
                         // Store the clusters in a HashMap. Here, the key would represent the 'name'
                         // of that cluster and ArrayList<Float> would represent the collection of all
