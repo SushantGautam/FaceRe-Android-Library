@@ -1,6 +1,9 @@
 *.iml
 .gradle
 /local.properties
+/.idea
+/app/src/androidTest
+/app/src/test
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -12,4 +15,3 @@
 /captures
 .externalNativeBuild
 .cxx
-/openCVLibrary310/build/

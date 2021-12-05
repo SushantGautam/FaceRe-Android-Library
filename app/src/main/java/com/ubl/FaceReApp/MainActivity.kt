@@ -1,106 +1,100 @@
 package com.ubl.FaceReApp
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
+import android.util.Base64
+import android.view.View
 import android.widget.Button
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.ubl.FaceRe.saveBitmap
-import com.ubl.FaceRe.startFaceReActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import androidx.appcompat.widget.AppCompatCheckBox
+import com.google.gson.Gson
+import com.ubl.FaceRe.FaceReActivity
+import java.io.ByteArrayOutputStream
 
+fun BitMapToString(bitmap: Bitmap): String {
+    val baos = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+    val b: ByteArray = baos.toByteArray()
+    return Base64.encodeToString(b, Base64.DEFAULT)
+}
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var button: Button
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Start the FaceRe Activity After Start Button is pressed
-        button = findViewById(R.id.button)
+
+        val button: Button = findViewById<View>(R.id.button) as Button
+
+
+
+
         button.setOnClickListener {
+            val intent = Intent(this, FaceReActivity::class.java)
+            val faceList = ArrayList<Pair<String, String>>()
+            val assetManager = applicationContext.assets
+            for (file in assetManager.list("")!!) {
+                if (file.endsWith(".jpg")) {
+//                items.add(file)
+                    faceList.add(
+                        Pair(
+                            file.toString(),
+                            BitMapToString(BitmapFactory.decodeStream(assets.open(file)))
+                        )
+                    )
+                }
+            }
 
-            // You need to pass various options as specified here
-            // Student Name, Student ID and Bitmap of Student Face
-            // onActivityResult is called after successfully completion of the Face Recognition
 
-            val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.bidhan)
-
-            startFaceReActivity(
-                callerClass = this,
-                StudentName = "Student Name",
-                StudentID = "Student ID",
-                StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!,
-                camera = if (CameraSwitch.isChecked) "front" else "back"
+            val sharedPrefs = getSharedPreferences(
+                this.packageName, Context.MODE_PRIVATE
             )
+            val editor: SharedPreferences.Editor = sharedPrefs.edit()
+            val gson = Gson()
+            val json = gson.toJson(faceList)
+            editor.putString("facereData", json).apply()
+            val checkbx = findViewById<View>(R.id.checkbx) as AppCompatCheckBox
+            editor.putBoolean("WantFrontCamera", checkbx.isChecked).apply()
+            editor.putBoolean("WantLogsDisplayed", true).apply()
+            editor.putInt("framesToCheck", 10).apply()
+            editor.putInt("successFramesRequired", 5).apply()
+            editor.putInt("timeOutTime", 8).apply()
+            editor.putInt("scoreThreshold", 50).apply()
+            editor.putString("StudentName", "Student Name").apply()
+            editor.putString("EPSRoll", "EPS Rpoll").apply()
+
+            launchFaceRe.launch(intent)
+
         }
 
-
-//        //temp delete me
-//
-//        val tempBitmap = BitmapFactory.decodeResource(resources, R.drawable.sushantylatest)
-//
-//        startFaceReActivity(
-//            callerClass = this,
-//            StudentName = "Student Name",
-//            StudentID = "Student ID",
-//            StudentBitmapFileName = saveBitmap(tempBitmap, applicationContext)!!,
-//            camera = if (CameraSwitch.isChecked) "front" else "back"
-//        )
-//        //temp delete me
     }
 
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        //  called after successfully completion of the Face Recognition
-
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == 514) {
-            val bundle: Bundle? = data?.extras
-            val status = bundle?.getString("status")
-            if (status == "success") {
-
-                //"score variable contains the average score obtained after recognition"
-                //"maxScore variable contains the max score obtained after recognition"
-                //"bitmap variable contains the image obtained after recognition"
-
-                val score = bundle.getDouble("score")
-                val maxScore = bundle.getDouble("maxScore")
-
-                // image is already saved on the device after recognition with name: "myFaceReImage" . .  get get it back
+    val launchFaceRe =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent = result.data!!
+                val bundle: Bundle? = data.extras
+                val score = bundle?.getInt("score")
+                val maxScore = bundle?.getInt("maxScore")
                 val bitmap = BitmapFactory.decodeStream(
                     this.openFileInput("myFaceReImage")
                 )
 
+                Toast.makeText(
+                    this@MainActivity,
+                    "FaceReComplete with score:" + score.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
 
-                Log.d("New Bitmap Received", bitmap.toString())
-                score.let { Log.d("Score", it.toString()) }
-                maxScore.let { Log.d("maxScore", it.toString()) }
-
-                //now you need to handle the data obtained.
-                // Save the data through REST or something.
-                // For a sample, I have shown the data in  NewActivity through successCallbackFunction function
-                successCallbackFunction(score, maxScore)
-            } else errorCallbackFunction()
+            }
         }
-    }
 
-    private fun successCallbackFunction(score: Double, maxScore: Double) {
-        //TODO: write what you want to do after success
-        val intent = Intent(this, NewActivity::class.java)
-        intent.putExtra("score", score)
-        intent.putExtra("maxScore", maxScore)
-        startActivity(intent)
-        return
-    }
-
-    private fun errorCallbackFunction() {
-        //TODO: Handle error
-        return
-    }
 
 }

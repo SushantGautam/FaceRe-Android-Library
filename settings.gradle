@@ -1,4 +1,3 @@
-include ':FaceRe'
-rootProject.name = 'FaceRe Android Library'
+rootProject.name='FaceNet Detection'
 include ':app'
-include ':openCVLibrary310'
+include ':FaceRe'
