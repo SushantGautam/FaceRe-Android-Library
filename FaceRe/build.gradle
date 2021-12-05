@@ -86,3 +86,5 @@ afterEvaluate {
         }
     }
 }
+
+group = 'com.github.ublrandd'
