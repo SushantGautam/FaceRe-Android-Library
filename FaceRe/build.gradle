@@ -1,12 +1,13 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'maven-publish'
 }
 
 //apply plugin: 'com.android.application'
 //apply plugin: 'kotlin-android'
 //apply plugin: 'kotlin-parcelize'
-apply plugin: 'maven-publish'
+//apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 31
@@ -91,4 +92,4 @@ afterEvaluate {
     }
 }
 
-group = 'com.github.ublrandd'
+group = 'com.github.SushantGautam'
