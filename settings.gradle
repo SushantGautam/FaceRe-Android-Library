@@ -1,3 +1,3 @@
-rootProject.name='FaceNet Detection'
+rootProject.name = 'FaceNet Detection'
 include ':app'
 include ':FaceRe'

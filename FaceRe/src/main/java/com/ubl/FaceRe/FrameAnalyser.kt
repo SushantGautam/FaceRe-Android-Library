@@ -345,7 +345,7 @@ class FrameAnalyser(
 
 
                         val faceMatched =
-                            if (arrayOf("Unknown").contains(bestScoreUserName)) false else true
+                            !arrayOf("Unknown").contains(bestScoreUserName)
 
                         FaceReActivity.pingFaceMatched(
                             avgScores.maxOrNull()!!,

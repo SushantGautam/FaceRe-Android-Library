@@ -106,7 +106,7 @@ class FaceReActivity : AppCompatActivity() {
 
         fun checkCanScrollVertically() {
             while (logTextView.canScrollVertically(1)) {
-                logTextView.scrollBy(0, 10);
+                logTextView.scrollBy(0, 10)
             }
         }
 
