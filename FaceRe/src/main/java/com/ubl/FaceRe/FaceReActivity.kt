@@ -82,6 +82,7 @@ class FaceReActivity : AppCompatActivity() {
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var progress_circular: ProgressBar
     private lateinit var ContinueIcon: ImageView
+    var facereSuccess = "Unverified"
     private lateinit var imageView: ImageView
     private lateinit var RetryIcon: ImageView
     private lateinit var PersonName: TextView
@@ -263,10 +264,16 @@ class FaceReActivity : AppCompatActivity() {
                 if (failure) {
                     ToneGenerator(AudioManager.STREAM_MUSIC, 100)
                         .startTone(ToneGenerator.TONE_CDMA_LOW_L, 2000)
+
+                    facereSuccess = "Unverified"
                 } else {
                     ToneGenerator(AudioManager.STREAM_MUSIC, 100)
                         .startTone(ToneGenerator.TONE_CDMA_PIP, 1000)
+                    facereSuccess = "Completed"
+
                 }
+
+
                 score
                 bestScore
                 lastcameraFrameBitmap
@@ -288,6 +295,7 @@ class FaceReActivity : AppCompatActivity() {
             data.putExtra("status", "success")
             data.putExtra("score", score)
             data.putExtra("maxScore", bestScore)
+            data.putExtra("facereSuccess", facereSuccess)
             setResult(Activity.RESULT_OK, data)
 
             //save the last frame locally in private to access in the user app

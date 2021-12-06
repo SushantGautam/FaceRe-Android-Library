@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity() {
                 val bundle: Bundle? = data.extras
                 val score = bundle?.getInt("score")
                 val maxScore = bundle?.getInt("maxScore")
+                val facereSuccess = bundle?.getString("facereSuccess")  //Unverified or Completed
                 val bitmap = BitmapFactory.decodeStream(
                     this.openFileInput("myFaceReImage")
                 )
