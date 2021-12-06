@@ -263,7 +263,17 @@ class FrameAnalyser(
     private suspend fun runModel(faces: List<Face>, cameraFrameBitmap: Bitmap) {
         withContext(Dispatchers.Default) {
             val predictions = ArrayList<Prediction>()
-            for (face in faces) {
+
+            fun getMaxArea(faces: List<Face>): Any {
+
+                fun getArea(face: Face): Int {
+                    return (face.boundingBox.bottom - face.boundingBox.top) * (face.boundingBox.right - face.boundingBox.left)
+                }
+                return faces.maxByOrNull { x -> getArea(x) }!!
+            }
+
+            val facesx: List<Face> = listOf(getMaxArea(faces)) as List<Face>
+            for (face in facesx) {
                 try {
                     // Crop the frame using face.boundingBox.
                     // Convert the cropped Bitmap to a ByteBuffer.

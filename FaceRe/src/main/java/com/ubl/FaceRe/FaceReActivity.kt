@@ -172,7 +172,7 @@ class FaceReActivity : AppCompatActivity() {
             //will be handled automatically from manifest from now
             assert(true)
         }
-        setContentView(R.layout.activity_facere)
+        setContentView(R.layout.activity_faceres)
 
         // Implementation of CameraX preview
 

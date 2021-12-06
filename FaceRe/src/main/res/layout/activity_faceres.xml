@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/landback"
+    tools:context="com.ubl.FaceRe.FaceReActivity">
+
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/preview_view"
+        android:layout_width="400dp"
+        android:layout_height="500dp"
+        android:layout_marginStart="200dp"
+        android:layout_marginEnd="85dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/TextRoll"
+        app:layout_constraintHorizontal_bias="0.029"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.203">
+
+    </androidx.camera.view.PreviewView>
+
+    <com.ubl.FaceRe.BoundingBoxOverlay
+        android:id="@+id/bbox_overlay"
+        android:layout_width="400dp"
+        android:layout_height="500dp"
+        android:paddingStart="16dp"
+
+        android:translationZ="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/preview_view"
+        app:layout_constraintStart_toStartOf="@+id/preview_view"
+        app:layout_constraintTop_toTopOf="@+id/preview_view" />
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginEnd="0dp"
+        android:contentDescription="TODO"
+        android:paddingStart="50dp"
+        android:translationZ="10dp"
+        app:layout_constraintEnd_toEndOf="@id/TextRoll"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/PersonName"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="25dp"
+
+        android:ems="10"
+        android:text="Sushant Gautam Hancy Nepal "
+        android:textAlignment="center"
+        android:textColor="#FBFBFB"
+        android:textSize="40px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+
+    <TextView
+        android:id="@+id/TextRoll"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+
+        android:ems="10"
+        android:minHeight="48dp"
+        android:text="EPSEXAMNEPALCODE000001"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="40px"
+        app:layout_constraintStart_toStartOf="@+id/PersonName"
+        app:layout_constraintTop_toBottomOf="@+id/PersonName" />
+
+
+    <TextView
+        android:id="@+id/log_textview"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:background="@drawable/textview_background"
+        android:gravity="bottom"
+        android:maxHeight="36dp"
+        android:padding="16dp"
+        android:text="Welcome!"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <ProgressBar
+        android:id="@+id/myProgress"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:max="100"
+        android:progress="40"
+        android:translationZ="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/preview_view"
+        app:layout_constraintEnd_toEndOf="@+id/preview_view"
+
+        />
+
+    <TextView
+        android:id="@+id/myTextProgress"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@android:color/transparent"
+        android:gravity="center_vertical"
+        android:text="⌛"
+        android:textAlignment="center"
+        android:textSize="45sp"
+        android:translationZ="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/preview_view"
+        app:layout_constraintEnd_toEndOf="@+id/preview_view" />
+
+
+    <ImageView
+        android:id="@+id/ContinueIcon"
+        android:layout_width="350dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="24dp"
+        android:contentDescription="TODO"
+        android:paddingStart="50dp"
+        android:translationZ="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TextRoll"
+        app:srcCompat="@mipmap/epspass" />
+
+    <ImageView
+        android:id="@+id/RetryIcon"
+        android:layout_width="350dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="24dp"
+        android:contentDescription="TODO"
+        android:paddingStart="50dp"
+        android:translationZ="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ContinueIcon"
+        app:srcCompat="@mipmap/epsretry" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
