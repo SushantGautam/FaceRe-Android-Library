@@ -272,119 +272,124 @@ class FrameAnalyser(
                 return faces.maxByOrNull { x -> getArea(x) }!!
             }
 
-            val facesx: List<Face> = listOf(getMaxArea(faces)) as List<Face>
-            for (face in facesx) {
-                try {
-                    // Crop the frame using face.boundingBox.
-                    // Convert the cropped Bitmap to a ByteBuffer.
-                    // Finally, feed the ByteBuffer to the FaceNet model.
-                    val croppedBitmap =
-                        BitmapUtils.cropRectFromBitmap(cameraFrameBitmap, face.boundingBox)
-                    subject = model.getFaceEmbedding(croppedBitmap)
+            var facesx: List<Face>? = null
+            if (faces.isNotEmpty()) {
+                facesx= listOf(getMaxArea(faces)) as List<Face>?
+            }
+            if (facesx != null) {
+                for (face in facesx) {
+                    try {
+                        // Crop the frame using face.boundingBox.
+                        // Convert the cropped Bitmap to a ByteBuffer.
+                        // Finally, feed the ByteBuffer to the FaceNet model.
+                        val croppedBitmap =
+                            BitmapUtils.cropRectFromBitmap(cameraFrameBitmap, face.boundingBox)
+                        subject = model.getFaceEmbedding(croppedBitmap)
 
-                    // Perform face mask detection on the cropped frame Bitmap.
-                    val maskLabel = "no mask"
-//                    if (isMaskDetectionOn) {
-////                        maskLabel = maskDetectionModel.detectMask(croppedBitmap)
-//                    }
+                        // Perform face mask detection on the cropped frame Bitmap.
+                        val maskLabel = "no mask"
+                        //                    if (isMaskDetectionOn) {
+                        ////                        maskLabel = maskDetectionModel.detectMask(croppedBitmap)
+                        //                    }
 
-                    // Continue with the recognition if the user is not wearing a face mask
-                    if (maskLabel == maskLabel) {
-                        // Perform clustering ( grouping )
-                        // Store the clusters in a HashMap. Here, the key would represent the 'name'
-                        // of that cluster and ArrayList<Float> would represent the collection of all
-                        // L2 norms/ cosine distances.
-                        for (i in 0 until faceList.size) {
-                            // If this cluster ( i.e an ArrayList with a specific key ) does not exist,
-                            // initialize a new one.
-                            if (nameScoreHashmap[faceList[i].first] == null) {
-                                // Compute the L2 norm and then append it to the ArrayList.
-                                val p = ArrayList<Float>()
-                                if (metricToBeUsed == "cosine") {
-                                    p.add(cosineSimilarity(subject, faceList[i].second))
-                                } else {
-                                    p.add(L2Norm(subject, faceList[i].second))
+                        // Continue with the recognition if the user is not wearing a face mask
+                        if (maskLabel == maskLabel) {
+                            // Perform clustering ( grouping )
+                            // Store the clusters in a HashMap. Here, the key would represent the 'name'
+                            // of that cluster and ArrayList<Float> would represent the collection of all
+                            // L2 norms/ cosine distances.
+                            for (i in 0 until faceList.size) {
+                                // If this cluster ( i.e an ArrayList with a specific key ) does not exist,
+                                // initialize a new one.
+                                if (nameScoreHashmap[faceList[i].first] == null) {
+                                    // Compute the L2 norm and then append it to the ArrayList.
+                                    val p = ArrayList<Float>()
+                                    if (metricToBeUsed == "cosine") {
+                                        p.add(cosineSimilarity(subject, faceList[i].second))
+                                    } else {
+                                        p.add(L2Norm(subject, faceList[i].second))
+                                    }
+                                    nameScoreHashmap[faceList[i].first] = p
                                 }
-                                nameScoreHashmap[faceList[i].first] = p
-                            }
-                            // If this cluster exists, append the L2 norm/cosine score to it.
-                            else {
-                                if (metricToBeUsed == "cosine") {
-                                    nameScoreHashmap[faceList[i].first]?.add(
-                                        cosineSimilarity(
-                                            subject,
-                                            faceList[i].second
+                                // If this cluster exists, append the L2 norm/cosine score to it.
+                                else {
+                                    if (metricToBeUsed == "cosine") {
+                                        nameScoreHashmap[faceList[i].first]?.add(
+                                            cosineSimilarity(
+                                                subject,
+                                                faceList[i].second
+                                            )
                                         )
-                                    )
-                                } else {
-                                    nameScoreHashmap[faceList[i].first]?.add(
-                                        L2Norm(
-                                            subject,
-                                            faceList[i].second
+                                    } else {
+                                        nameScoreHashmap[faceList[i].first]?.add(
+                                            L2Norm(
+                                                subject,
+                                                faceList[i].second
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                             }
-                        }
 
-                        // Compute the average of all scores norms for each cluster.
-                        val avgScores = nameScoreHashmap.values.map { scores ->
-                            scores.toFloatArray().average()
-                        }
-                        Logger.log("Average score for each user : $nameScoreHashmap")
+                            // Compute the average of all scores norms for each cluster.
+                            val avgScores = nameScoreHashmap.values.map { scores ->
+                                scores.toFloatArray().average()
+                            }
+                            Logger.log("Average score for each user : $nameScoreHashmap")
 
-                        val names = nameScoreHashmap.keys.toTypedArray()
-                        nameScoreHashmap.clear()
+                            val names = nameScoreHashmap.keys.toTypedArray()
+                            nameScoreHashmap.clear()
 
-                        // Calculate the minimum L2 distance from the stored average L2 norms.
-                        val bestScoreUserName: String = if (metricToBeUsed == "cosine") {
-                            // In case of cosine similarity, choose the highest value.
-                            if (avgScores.maxOrNull()!! > model.model.cosineThreshold) {
-                                names[avgScores.indexOf(avgScores.maxOrNull()!!)]
+                            // Calculate the minimum L2 distance from the stored average L2 norms.
+                            val bestScoreUserName: String = if (metricToBeUsed == "cosine") {
+                                // In case of cosine similarity, choose the highest value.
+                                if (avgScores.maxOrNull()!! > model.model.cosineThreshold) {
+                                    names[avgScores.indexOf(avgScores.maxOrNull()!!)]
+                                } else {
+                                    "Unknown"
+                                }
                             } else {
-                                "Unknown"
+                                // In case of L2 norm, choose the lowest value.
+                                if (avgScores.minOrNull()!! > model.model.l2Threshold) {
+                                    "Unknown"
+                                } else {
+                                    names[avgScores.indexOf(avgScores.minOrNull()!!)]
+                                }
                             }
+
+
+                            val faceMatched =
+                                !arrayOf("Unknown").contains(bestScoreUserName)
+
+                            FaceReActivity.pingFaceMatched(
+                                avgScores.maxOrNull()!!,
+                                cameraFrameBitmap,
+                                faceMatched
+                            ) //informFaceMatched
+
+                            Logger.log("Person identified as $bestScoreUserName")
+                            predictions.add(
+                                Prediction(
+                                    face.boundingBox,
+                                    bestScoreUserName,
+                                    maskLabel
+                                )
+                            )
                         } else {
-                            // In case of L2 norm, choose the lowest value.
-                            if (avgScores.minOrNull()!! > model.model.l2Threshold) {
-                                "Unknown"
-                            } else {
-                                names[avgScores.indexOf(avgScores.minOrNull()!!)]
-                            }
+                            // Inform the user to remove the mask
+                            predictions.add(
+                                Prediction(
+                                    face.boundingBox,
+                                    "Please remove the mask",
+                                    maskLabel
+                                )
+                            )
                         }
-
-
-                        val faceMatched =
-                            !arrayOf("Unknown").contains(bestScoreUserName)
-
-                        FaceReActivity.pingFaceMatched(
-                            avgScores.maxOrNull()!!,
-                            cameraFrameBitmap,
-                            faceMatched
-                        ) //informFaceMatched
-
-                        Logger.log("Person identified as $bestScoreUserName")
-                        predictions.add(
-                            Prediction(
-                                face.boundingBox,
-                                bestScoreUserName,
-                                maskLabel
-                            )
-                        )
-                    } else {
-                        // Inform the user to remove the mask
-                        predictions.add(
-                            Prediction(
-                                face.boundingBox,
-                                "Please remove the mask",
-                                maskLabel
-                            )
-                        )
+                    } catch (e: Exception) {
+                        // If any exception occurs with this box and continue with the next boxes.
+                        Log.e("Model", "Exception in FrameAnalyser : ${e.message}")
+                        continue
                     }
-                } catch (e: Exception) {
-                    // If any exception occurs with this box and continue with the next boxes.
-                    Log.e("Model", "Exception in FrameAnalyser : ${e.message}")
-                    continue
                 }
             }
 //            find scores of bestScoreUserName
