@@ -25,8 +25,11 @@ import android.view.SurfaceView
 import androidx.core.graphics.toRectF
 
 // Defines an overlay on which the boxes and text will be drawn.
-class BoundingBoxOverlay( context: Context , attributeSet: AttributeSet )
-    : SurfaceView( context , attributeSet ) , SurfaceHolder.Callback {
+class BoundingBoxOverlay(context: Context, attributeSet: AttributeSet) :
+    SurfaceView(context, attributeSet), SurfaceHolder.Callback {
+
+
+    var IsFrontLens: Boolean? = null
 
     // Variables used to compute output2overlay transformation matrix
     // These are assigned in FrameAnalyser.kt
@@ -78,10 +81,12 @@ class BoundingBoxOverlay( context: Context , attributeSet: AttributeSet )
                 val yFactor: Float = viewHeight / frameHeight.toFloat()
                 // Scale and mirror the coordinates ( required for front lens )
                 output2OverlayTransform.preScale(xFactor, yFactor)
-                output2OverlayTransform.postScale(-1f, 1f, viewWidth / 2f, viewHeight / 2f)
+                if (IsFrontLens == true)
+                    output2OverlayTransform.postScale(-1f, 1f, viewWidth / 2f, viewHeight / 2f)
+                else output2OverlayTransform.postScale(1f, 1f, viewWidth / 2f, viewHeight / 2f)
+
                 areDimsInit = true
-            }
-            else {
+            } else {
                 for (face in faceBoundingBoxes!!) {
                     val boundingBox = face.bbox.toRectF()
                     output2OverlayTransform.mapRect(boundingBox)
@@ -92,7 +97,7 @@ class BoundingBoxOverlay( context: Context , attributeSet: AttributeSet )
                         boundingBox.centerY(),
                         textPaint
                     )
-                    if ( drawMaskLabel ) {
+                    if (drawMaskLabel) {
                         canvas?.drawText(
                             face.maskLabel,
                             boundingBox.centerX(),

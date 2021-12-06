@@ -196,7 +196,6 @@ class FaceReActivity : AppCompatActivity() {
         boundingBoxOverlay.setWillNotDraw(false)
         boundingBoxOverlay.setZOrderOnTop(true)
 
-        frameAnalyser = FrameAnalyser(this, boundingBoxOverlay)
         fileReader = FileReader(this)
 
 
@@ -209,6 +208,10 @@ class FaceReActivity : AppCompatActivity() {
             this.packageName, Context.MODE_PRIVATE
         )
         val WantFrontCamera = sharedPrefs.getBoolean("WantFrontCamera", false)
+
+
+        frameAnalyser = FrameAnalyser(this, boundingBoxOverlay, WantFrontCamera)
+
         val WantLogsDisplayed = sharedPrefs.getBoolean("WantLogsDisplayed", false)
         framesToCheck = sharedPrefs.getInt("framesToCheck", 10)
         successFramesRequired = sharedPrefs.getInt("successFramesRequired", 5)

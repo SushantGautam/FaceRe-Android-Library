@@ -40,7 +40,7 @@ import kotlin.math.sqrt
 // Analyser class to process frames and produce detections.
 class FrameAnalyser(
     private var context: Context,
-    private var boundingBoxOverlay: BoundingBoxOverlay
+    private var boundingBoxOverlay: BoundingBoxOverlay, private var IsFrontLens: Boolean
 ) : ImageAnalysis.Analyzer {
 
     private val realTimeOpts = FaceDetectorOptions.Builder()
@@ -382,6 +382,7 @@ class FrameAnalyser(
             withContext(Dispatchers.Main) {
                 // Clear the BoundingBoxOverlay and set the new results ( boxes ) to be displayed.
                 boundingBoxOverlay.faceBoundingBoxes = predictions
+                boundingBoxOverlay.IsFrontLens = IsFrontLens
                 boundingBoxOverlay.invalidate()
 
                 isProcessing = false
